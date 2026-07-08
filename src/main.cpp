@@ -73,6 +73,11 @@ void InputHandling(Game &game)
         game.player.velocity.x -= 5;
         game.player.facingRight = false;
     }
+
+    if(IsKeyPressed(KEY_UP) && game.player.grounded)
+    {
+        game.player.velocity.y = -18;
+    }
 }
 
 //updates the necessary things in each iteration
@@ -96,6 +101,9 @@ void Update(Game &game)
         game.player.velocity.y = 0;
 
         game.player.grounded = true;
+
+        //updating hitbox according to the position of the player
+        game.player.body.y = game.player.position.y;
     }
     else 
     {
