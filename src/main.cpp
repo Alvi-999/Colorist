@@ -9,7 +9,9 @@ struct Player
     //player er current position
     Vector2 position;
 
-    //Nicher dike porar speed
+    //velocity of player
+
+    
     Vector2 velocity;
 
     //graphics
@@ -55,7 +57,7 @@ struct Game
 };
 
 //handles necessary inputs
-void Inputs(Game &game)
+void InputHandling(Game &game)
 {
     if(IsKeyDown(KEY_D))
     {
@@ -70,6 +72,25 @@ void Inputs(Game &game)
     if(IsKeyDown(KEY_S)) game.player.position.y += 5;
     
     if(IsKeyDown(KEY_W)) game.player.position.y -= 5;
+}
+
+//updates the necessary things in each iteration
+void Update(Game &game)
+{
+    game.player.body.x = game.player.position.x;
+    game.player.body.y = game.player.position.y;
+}
+
+//draws the frames in each iteration
+void DrawCanvas(Game &game)
+{
+    BeginDrawing();
+
+    ClearBackground(BLACK);
+
+    DrawRectangleRec(game.player.body, BLUE);
+
+    EndDrawing();
 }
 
 int main()
@@ -92,19 +113,13 @@ int main()
     while (!WindowShouldClose())
     {
         //shob input eikhane jabe
-        Inputs(game);
+        InputHandling(game);
 
+        //updates the necessary parameters
+        Update(game);
 
-        game.player.body.x = game.player.position.x;
-        game.player.body.y = game.player.position.y;
-
-        BeginDrawing();
-
-        ClearBackground(BLACK);
-
-        DrawRectangleRec(game.player.body, BLUE);
-
-        EndDrawing();
+        //draws the canvas
+        DrawCanvas(game);
     }
 
     CloseWindow();
