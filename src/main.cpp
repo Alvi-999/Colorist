@@ -78,6 +78,9 @@ void InputHandling(Game &game)
 //updates the necessary things in each iteration
 void Update(Game &game)
 {
+    //added gravity
+    game.player.velocity.y += 1;
+
     //speed onujayi jabe
     game.player.position.x += game.player.velocity.x;
     game.player.position.y += game.player.velocity.y;
