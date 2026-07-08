@@ -3,6 +3,8 @@
 
 using namespace std;
 
+Rectangle ground = {0, 650, 1280, 70};
+
 //the necessary infos about the player
 struct Player
 {
@@ -59,26 +61,43 @@ struct Game
 //handles necessary inputs
 void InputHandling(Game &game)
 {
-    if(IsKeyDown(KEY_D))
+    game.player.velocity.x = 0;
+
+    if(IsKeyDown(KEY_RIGHT))
     {
-        game.player.position.x += 5;
+        game.player.velocity.x += 5;
         game.player.facingRight = true;
     }
-    if(IsKeyDown(KEY_A))
+    if(IsKeyDown(KEY_LEFT))
     {
-        game.player.position.x -= 5;
+        game.player.velocity.x -= 5;
         game.player.facingRight = false;
     }
-    if(IsKeyDown(KEY_S)) game.player.position.y += 5;
-    
-    if(IsKeyDown(KEY_W)) game.player.position.y -= 5;
 }
 
 //updates the necessary things in each iteration
 void Update(Game &game)
 {
+    //speed onujayi jabe
+    game.player.position.x += game.player.velocity.x;
+    game.player.position.y += game.player.velocity.y;
+    
+    //player er position er shathe hitbox move korabo
     game.player.body.x = game.player.position.x;
     game.player.body.y = game.player.position.y;
+
+    if(CheckCollisionRecs(game.player.body, ground))
+    {
+        game.player.position.y = ground.y - game.player.body.height;
+
+        game.player.velocity.y = 0;
+
+        game.player.grounded = true;
+    }
+    else 
+    {
+        game.player.grounded = false;
+    }
 }
 
 //draws the frames in each iteration
@@ -88,6 +107,8 @@ void DrawCanvas(Game &game)
 
     ClearBackground(BLACK);
 
+    DrawRectangleRec(ground, DARKGRAY);
+    
     DrawRectangleRec(game.player.body, BLUE);
 
     EndDrawing();
