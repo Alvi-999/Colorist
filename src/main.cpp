@@ -1,9 +1,23 @@
 #include <bits/stdc++.h>
 #include <raylib.h>
 
+const int IDLE = 0;
+const int RUN = 1;
+const int JUMP = 2;
+const int FALL = 3;
+const int ATTACK = 4;
+const int DASH = 5;
+
+
 using namespace std;
 
 Rectangle ground = {0, 650, 1280, 70};
+
+
+struct Platform
+{
+    Rectangle body;
+};
 
 //the necessary infos about the player
 struct Player
@@ -31,6 +45,9 @@ struct Player
     //kondike firra ase oita bujte
     bool facingRight;
 
+    //player kon state e ase oita
+    int state;
+
     int health;
 };
 
@@ -53,6 +70,10 @@ struct Game
     Player player;
 
     Enemy enemies[20];
+
+    Platform platforms[20];
+
+    int platform_count;
 
     //camera controls
     Camera2D camera;
@@ -94,20 +115,23 @@ void Update(Game &game)
     game.player.body.x = game.player.position.x;
     game.player.body.y = game.player.position.y;
 
-    if(CheckCollisionRecs(game.player.body, ground))
-    {
-        game.player.position.y = ground.y - game.player.body.height;
-
-        game.player.velocity.y = 0;
-
-        game.player.grounded = true;
-
-        //updating hitbox according to the position of the player
-        game.player.body.y = game.player.position.y;
-    }
-    else 
+    for(int i = 0; i < game.platform_count; i++)
     {
         game.player.grounded = false;
+
+        if(CheckCollisionRecs(game.player.body, game.platforms[i].body))
+        {
+            game.player.position.y = ground.y - game.player.body.height;
+
+            game.player.velocity.y = 0;
+
+            game.player.grounded = true;
+
+            //updating hitbox according to the position of the player
+            game.player.body.y = game.player.position.y;
+
+            break;
+        }
     }
 }
 
@@ -118,7 +142,10 @@ void DrawCanvas(Game &game)
 
     ClearBackground(BLACK);
 
-    DrawRectangleRec(ground, DARKGRAY);
+    for(int i = 0; i < game.platform_count; i++)
+    {
+        DrawRectangleRec(game.platforms[i].body, DARKGRAY);
+    }
     
     DrawRectangleRec(game.player.body, BLUE);
 
@@ -132,6 +159,12 @@ int main()
 
     //our main workzone
     Game game;
+
+    game.platform_count = 3;
+
+    game.platforms[0].body = {0, 650, 1280, 70};
+    game.platforms[1].body = {250, 650, 1280, 70};
+    game.platforms[2].body = {650, 400, 250, 20};
 
     game.player.position = {100, 300};
     game.player.velocity = {0, 0};
