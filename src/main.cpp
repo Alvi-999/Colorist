@@ -1,15 +1,22 @@
 #include <bits/stdc++.h>
 #include <raylib.h>
 
+//jate jekono somoy player er obostha check kora jay
 const int IDLE = 0;
 const int RUN = 1;
 const int JUMP = 2;
 const int FALL = 3;
 const int ATTACK = 4;
 const int DASH = 5;
+
+
+//egula dewa hoise jate amra icchamoto easily ei value gula change korte pari
+//pura code notun bhabe na leikha
 const float GRAVITY = 0.8f;
 const float MOVE_SPEED = 5.0f;
 const float JUMP_FORCE = -18.0f;
+
+
 
 using namespace std;
 
@@ -135,6 +142,8 @@ void Update(Game &game)
             break;
         }
     }
+
+    game.camera.target = game.player.position;
 }
 
 //draws the frames in each iteration
@@ -144,11 +153,15 @@ void DrawCanvas(Game &game)
 
     ClearBackground(BLACK);
 
+    BeginMode2D(game.camera);
+
+    //draw platforms
     for(int i = 0; i < game.platform_count; i++)
     {
         DrawRectangleRec(game.platforms[i].body, DARKGRAY);
     }
     
+    //draw player
     DrawRectangleRec(game.player.body, BLUE);
 
     EndDrawing();
@@ -162,20 +175,32 @@ int main()
     //our main workzone
     Game game;
 
+    //for platforms
     game.platform_count = 3;
 
-    game.platforms[0].body = {0, 650, 1280, 70};
+    game.platforms[0].body = {0, 650, 5000, 70};
     game.platforms[1].body = {250, 650, 1280, 70};
     game.platforms[2].body = {650, 400, 250, 20};
+    //end of platforms
 
+    //player position initialization
     game.player.position = {100, 300};
     game.player.velocity = {0, 0};
 
+    //defining the hitbox
     game.player.body = {game.player.position.x, game.player.position.y, 32, 64};
 
+    //other parameters
     game.player.health = 100;
     game.player.grounded = false;
     game.player.facingRight = true;
+
+
+    //for camera
+    game.camera.target = game.player.position;
+    game.camera.offset = {640, 360};
+    game.camera.rotation = 0.0f;
+    game.camera.zoom = 1.0f;
 
     while (!WindowShouldClose())
     {
