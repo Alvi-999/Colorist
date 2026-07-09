@@ -7,7 +7,9 @@ const int JUMP = 2;
 const int FALL = 3;
 const int ATTACK = 4;
 const int DASH = 5;
-
+const float GRAVITY = 0.8f;
+const float MOVE_SPEED = 5.0f;
+const float JUMP_FORCE = -18.0f;
 
 using namespace std;
 
@@ -86,18 +88,18 @@ void InputHandling(Game &game)
 
     if(IsKeyDown(KEY_RIGHT))
     {
-        game.player.velocity.x += 5;
+        game.player.velocity.x = MOVE_SPEED;
         game.player.facingRight = true;
     }
     if(IsKeyDown(KEY_LEFT))
     {
-        game.player.velocity.x -= 5;
+        game.player.velocity.x = -MOVE_SPEED;
         game.player.facingRight = false;
     }
 
     if(IsKeyPressed(KEY_UP) && game.player.grounded)
     {
-        game.player.velocity.y = -18;
+        game.player.velocity.y = JUMP_FORCE;
     }
 }
 
@@ -105,7 +107,7 @@ void InputHandling(Game &game)
 void Update(Game &game)
 {
     //added gravity
-    game.player.velocity.y += 1;
+    game.player.velocity.y += GRAVITY;
 
     //speed onujayi jabe
     game.player.position.x += game.player.velocity.x;
