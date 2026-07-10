@@ -57,7 +57,8 @@ struct Player
     //player kon state e ase oita
     int state;
 
-    int health;
+    //changed health to hits
+    int hits;
 };
 
 //the things necessary to design the enemy
@@ -69,7 +70,8 @@ struct Enemy
 
     Rectangle body;
 
-    int health;
+    //changed health to hits
+    int hits;
 };
 
 
@@ -191,7 +193,7 @@ int main()
     game.player.body = {game.player.position.x, game.player.position.y, 32, 64};
 
     //other parameters
-    game.player.health = 100;
+    game.player.hits = 5;
     game.player.grounded = false;
     game.player.facingRight = true;
 
