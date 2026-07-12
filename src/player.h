@@ -1,5 +1,8 @@
 #pragma once
 #include <raylib.h>
+#include <bits/stdc++.h>
+
+using namespace std;
 
 const float GRAVITY = 0.8f;
 const float MOVE_SPEED = 3.0f;
@@ -23,7 +26,12 @@ typedef struct
     float desiredHeight;
 } Player;
 
-// initially player er condition bujhay
+//-----------------global variable for double jump----------------
+    bool doubleJumpAvailable;
+    clock_t airTimeStart=0;
+
+
+// -----------------------initially player er condition bujhay------------------------------------------
 void initial_condition_of_player(Player &player)
 {
     player.x = 200;
@@ -39,7 +47,7 @@ void initial_condition_of_player(Player &player)
     player.desiredWidth = 64.0f;
 }
 
-// character er png file onek boro pixel er jonno, eta character ta ke choto dekhay jate amader character map er pura jayga khaya na fele
+//------------- character er size mapmoto thik kore -----------------------------
 void resize_sprite(Player &player)
 {
     //eta represent kore actual image ta
@@ -88,6 +96,8 @@ void updatemovement(Player &player)
     {
         player.velocity.y = JUMP_FORCE;
         player.isGrounded = false;
+
+        airTimeStart = clock();
     }
 
     // ---------- Gravity (every frame) ----------
@@ -100,5 +110,24 @@ void updatemovement(Player &player)
         player.y = GROUND_Y;      // mati te atke jabe, niche namte parbe na
         player.velocity.y = 0;
         player.isGrounded = true;
+
+        doubleJumpAvailable = true;
+        airTimeStart = 0;
+    }
+
+    // ------------- Double Jump ---------------
+    int airtimeinMS = ( (clock()-airTimeStart) * 1000 ) / CLOCKS_PER_SEC ;
+    if(IsKeyPressed(KEY_W) && airtimeinMS>170 && airtimeinMS<300 && doubleJumpAvailable)
+    {
+        player.velocity.y = JUMP_FORCE;
+        doubleJumpAvailable = false;
     }
 }
+
+
+/*
+Double jump raf
+Ekta single jump er airtime 465-470 miliseconds
+
+235+-70 er range e jump korte parbe
+*/
