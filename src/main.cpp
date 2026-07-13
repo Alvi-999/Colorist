@@ -16,8 +16,8 @@ int main()
 
     // sprite er png file size e onek boro pura map parle cover kore felabe
     // for that reason eita variable rakhsi map ar sprite er size er ratio thik korte
-    float desiredWidth = 64.0f;
-    float desiredHeight = 64.0f;
+    // float desiredWidth = 64.0f;
+    // float desiredHeight = 64.0f;
 
     SetTargetFPS(60);
 
