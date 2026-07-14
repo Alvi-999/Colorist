@@ -2,41 +2,37 @@
 #include <raylib.h>
 #include "player.h"
 #include "game.h"
+#include "map.h"
 
 using namespace std;
 
-const float desiredWidth = 64.0f;
-const float desiredHeight = 64.0f;
-
 int main()
 {
-    InitWindow(736, 501, "demo map e kahini korbo");
-    ChangeDirectory(GetApplicationDirectory());
+    InitWindow(1280, 720, "Colorist");
 
-    Player player; 
-    Texture2D Demo_map = LoadTexture("Demo_map.png");
-    initial_condition_of_player(player);
+    Player player;
+    Map map;
+    
+    InitializePlayer(player);
 
-    // sprite er png file size e onek boro pura map parle cover kore felabe
-    // for that reason eita variable rakhsi map ar sprite er size er ratio thik korte
-
-    SetTargetFPS(60);
+    LoadMap(map);
 
     while(!WindowShouldClose())
     {
-        update_game(player);
+        UpdateGame(player, map);
 
         BeginDrawing();
-            ClearBackground(RAYWHITE);
-            DrawTexture(Demo_map, 0, 0, WHITE);
 
-            resize_sprite(player);
+        ClearBackground(BLACK);
+
+        DrawGame(player, map);
 
         EndDrawing();
     }
 
-    UnloadTexture(player.Sprite);
-    UnloadTexture(Demo_map);
+    UnloadMap(map);
+    UnloadTexture(player.sprite);
+
     CloseWindow();
     
     return 0;
