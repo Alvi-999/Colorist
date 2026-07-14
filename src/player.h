@@ -82,3 +82,36 @@ void InitializePlayer(Player &player)
 
     player.hits = MAX_HITS;
 }
+
+void InputHandling(Player &player)
+{
+    player.velocity.x = 0;
+
+    if(IsKeyDown(KEY_D))
+    {
+        player.velocity.x = MOVE_SPEED;
+        player.facingRight = true;
+    }
+
+    if(IsKeyDown(KEY_LEFT))
+    {
+        player.velocity.x = -MOVE_SPEED;    
+        player.facingRight = false;
+    }
+
+    //first jump
+    if(IsKeyPressed(KEY_UP) && player.grounded)
+    {
+        player.velocity.y = JUMP_FORCE;
+
+        player.grounded = false;
+    }
+    
+    //the second jump
+    else if(IsKeyPressed(KEY_UP) && !player.grounded && player.doubleJumpAvailable)
+    {
+        player.doubleJumpAvailable = false;
+
+        player.velocity.y = JUMP_FORCE;
+    }
+}
