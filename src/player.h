@@ -57,21 +57,9 @@ void InitializePlayer(Player &player)
     player.width = 64;
     player.height = 64;
 
-    player.body =
-    {
-        player.position.x,
-        player.position.y,
-        player.width,
-        player.height
-    };
+    player.body = {player.position.x, player.position.y, player.width, player.height};
 
-    player.attack =
-    {
-        player.position.x,
-        player.position.y,
-        50,
-        30
-    };
+    player.attack = {player.position.x, player.position.y, 50, 30};
 
     player.sprite = LoadTexture("assets/player/idle_right.png");
 
@@ -81,7 +69,7 @@ void InitializePlayer(Player &player)
 
     player.doubleJumpAvailable = true;
 
-    player.state = IDLE;
+    player.state = IDLER;
 
     player.hits = MAX_HITS;
 }
@@ -96,14 +84,14 @@ void InputHandling(Player &player)
         player.facingRight = true;
     }
 
-    if(IsKeyDown(KEY_LEFT))
+    if(IsKeyDown(KEY_D))
     {
         player.velocity.x = -MOVE_SPEED;    
         player.facingRight = false;
     }
 
     //first jump
-    if(IsKeyPressed(KEY_UP) && player.grounded)
+    if(IsKeyPressed(KEY_W) && player.grounded)
     {
         player.velocity.y = JUMP_FORCE;
 
@@ -121,20 +109,57 @@ void InputHandling(Player &player)
 
 void UpdatePlayerState(Player &player)
 {
+    //if jumping
     if(player.velocity.y < 0)
     {
-        player.state = JUMP;
+        if(player.facingRight) player.state = JUMPR;
+        else player.state = JUMPL;
     }
 
+    //falling
     else if((player.velocity.y > 0) and !player.grounded)
     {
         player.state = FALL;
     }
 
+    //runnin
     else if(player.velocity.x != 0)
     {
-        player.state = RUN;
+        if(player.facingRight) player.state = RUNR;
+        else player.state = RUNL;
     }
-    else player.state = IDLE;
+    
+    //idle
+    else 
+    {
+        if(player.facingRight) player.state = IDLER;
+        else player.state = IDLEL;
+    }
 }
 
+void DrawPlayer(Player &player)
+{
+    Rectangle source = {0, 0, (float)player.sprite.width, (float)player.sprite.height};
+
+    if(!player.facingRight)
+    {
+        source.width *= -1;
+    }
+
+    Rectangle destination = {player.position.x, player.position.y, player.width, player.height};
+
+    DrawTexturePro(player.sprite, source, destination, {0, 0}, 0, WHITE);
+}
+
+void UpdateMovement(Player &player)
+{
+    player.velocity.y += GRAVITY;
+
+    //MOVE PLAYER
+    player.position.x += player.velocity.x;
+    player.position.y += player.velocity.y;
+
+    //update hitbox
+    player.body.x = player.position.x;
+    player.body.y = player.position.y;
+}
