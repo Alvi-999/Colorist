@@ -115,3 +115,23 @@ void InputHandling(Player &player)
         player.velocity.y = JUMP_FORCE;
     }
 }
+
+void UpdatePlayerState(Player &player)
+{
+    if(player.velocity.y < 0)
+    {
+        player.state = JUMP;
+    }
+
+    else if((player.velocity.y > 0) and !player.grounded)
+    {
+        player.state = FALL;
+    }
+
+    else if(player.velocity.x != 0)
+    {
+        player.state = RUN;
+    }
+    else player.state = IDLE;
+}
+
