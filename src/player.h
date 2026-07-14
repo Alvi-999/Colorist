@@ -139,16 +139,35 @@ void UpdatePlayerState(Player &player)
 
 void DrawPlayer(Player &player)
 {
-    // Rectangle source = {0, 0, (float)player.sprite.width, (float)player.sprite.height};
+    //player animation goes here
+    //for example, you can just run a switch here
+    //depending on the state of player 
+    //animation will run
 
-    // if(!player.facingRight)
-    // {
-    //     source.width *= -1;
-    // }
 
-    // Rectangle destination = {player.position.x, player.position.y, player.width, player.height};
+    (JUST PUT THE FUNCTION TO THE ANIMATIONS HERE)
+    /*switch(player.state)
+    {
+        case IDLER:
+            break;
 
-    // DrawTexturePro(player.sprite, source, destination, {0, 0}, 0, WHITE);
+        case IDLEL:
+            break;
+
+        case RUNR:
+            break;
+
+        case RUNL:
+            break;
+        
+        case JUMPL:
+            break;
+
+        case FALL:
+            break;
+
+    }*/
+    
 
     DrawRectangleRec(player.body, WHITE);
     
@@ -156,13 +175,13 @@ void DrawPlayer(Player &player)
 
 void UpdateMovement(Player &player)
 {
+    //gravity
     player.velocity.y += GRAVITY;
 
     //MOVE PLAYER
     player.position.x += player.velocity.x;
-    player.position.y += player.velocity.y;
-
-    //update hitbox
     player.body.x = player.position.x;
+
+    player.position.y += player.velocity.y;
     player.body.y = player.position.y;
 }
