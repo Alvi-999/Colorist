@@ -2,8 +2,29 @@
 
 #include <raylib.h>
 #include "player.h"
+#include "map.h"
+#include "collision.h"
 
-void update_game(Player &player)
+void UpdateGame(Player &player, Map &map)
 {
-    updatemovement(player);
+    //read keyboard & mouse
+    InputHandling(player);
+
+    UpdateMovement(player);
+
+    //collision
+    // GreenCollision(player, map);
+    // RedCollision(player, map);
+    // YellowCollision(player, map);
+    // BlueCollision(player, map);
+
+    //animation state
+    UpdatePlayerState(player);
+}
+
+void DrawGame(Player &player, Map &map)
+{
+    DrawMap(map);
+
+    DrawPlayer(player);
 }
