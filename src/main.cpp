@@ -9,6 +9,7 @@ using namespace std;
 int main()
 {
     InitWindow(1280, 720, "Colorist");
+    SetTargetFPS(60);
 
     Player player;
     Map map;

@@ -23,10 +23,13 @@ void GreenCollision(Player &player, Map &map)
 
     for(int i = 0; i < map.greenCount; i++)
     {
-        if(CheckCollisionRecs(player.body, map.green[i].body))
+        if(CheckCollisionRecs(player.body, map.green[i].body) && player.velocity.y > 0)
         {
-            LandPlayer(player, map.green[i].body);
-            break;
+            player.position.y = map.green[i].body.y - player.body.height;
+            player.velocity.y = 0;
+            player.grounded = true;
+            player.doubleJumpAvailable = true;
+            player.body.y = player.position.y;
         }
     }
 }
@@ -35,10 +38,13 @@ void RedCollision(Player &player, Map &map)
 {
     for(int i = 0; i < map.redCount; i++)
     {
-        if(CheckCollisionRecs(player.body, map.red[i].body))
+        if(CheckCollisionRecs(player.body, map.red[i].body) && player.velocity.y > 0)
         {
-            LandPlayer(player, map.red[i].body);
-            break;
+            player.position.y = map.red[i].body.y - player.body.height;
+            player.velocity.y = 0;
+            player.grounded = true;
+            player.doubleJumpAvailable = true;
+            player.body.y = player.position.y;
         }
     }
 }
@@ -47,10 +53,13 @@ void YellowCollision(Player &player, Map &map)
 {
     for(int i = 0; i < map.yellowCount; i++)
     {
-        if(CheckCollisionRecs(player.body, map.yellow[i].body))
+        if(CheckCollisionRecs(player.body, map.yellow[i].body) && player.velocity.y > 0)
         {
-            LandPlayer(player, map.yellow[i].body);
-            break;
+            player.position.y = map.yellow[i].body.y - player.body.height;
+            player.velocity.y = 0;
+            player.grounded = true;
+            player.doubleJumpAvailable = true;
+            player.body.y = player.position.y;
         }
     }
 }
@@ -59,9 +68,13 @@ void BlueCollision(Player &player, Map &map)
 {
     for(int i = 0; i < map.blueCount; i++)
     {
-        if(CheckCollisionRecs(player.body, map.blue[i].body))
+        if(CheckCollisionRecs(player.body, map.blue[i].body) && player.velocity.y > 0)
         {
-            player.velocity.y -= map.blue[i].buoyancy;
+            player.position.y = map.blue[i].body.y - player.body.height;
+            player.velocity.y = 0;
+            player.grounded = true;
+            player.doubleJumpAvailable = true;
+            player.body.y = player.position.y;
         }
     }
 }

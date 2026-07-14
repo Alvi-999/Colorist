@@ -5,8 +5,8 @@
 
 
 // Physics constants
-const float GRAVITY = 0.8f;
-const float MOVE_SPEED = 5.0f;
+const float GRAVITY = 1.00f;
+const float MOVE_SPEED = 3.5f;
 const float JUMP_FORCE = -18.0f;
 
 // Player states
@@ -99,7 +99,7 @@ void InputHandling(Player &player)
     }
     
     //the second jump
-    else if(IsKeyPressed(KEY_UP) && !player.grounded && player.doubleJumpAvailable)
+    else if(IsKeyPressed(KEY_W) && !player.grounded && player.doubleJumpAvailable)
     {
         player.doubleJumpAvailable = false;
 
