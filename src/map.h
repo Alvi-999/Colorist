@@ -72,11 +72,32 @@ void LoadMap(Map &map)
     map.green[1].body;
     map.green[1].texture = LoadTexture("assets/platforms/groundg2.png");
 
-    map.blueCount = 2;
-    map.greenCount = 2;
-    map.yellowCount = 2;
-    map.redCount = 2;
+    // map.blueCount = 2;
+    // map.greenCount = 2;
+    // map.yellowCount = 2;
+    // map.redCount = 2;
 
+    // map.greenCount = 2;
+    // map.redCount = 1;
+    // map.blueCount = 1;
+    // map.yellowCount = 1;
+
+    // map.yellow[0].broken = false;
+
+    // // Ground
+    // map.green[0].body = {0, 650, 1000, 70};
+
+    // // Floating platform
+    // map.green[1].body = {300, 500, 200, 40};
+
+    // // Red platform
+    // map.red[0].body = {650, 420, 200, 40};
+
+    // // Blue platform
+    // map.blue[0].body = {1000, 350, 200, 40};
+
+    // // Yellow platform
+    // map.yellow[0].body = {1350, 280, 200, 40};
 }
 
 void UnloadMap(Map &map)
@@ -94,47 +115,55 @@ void UnloadMap(Map &map)
 
 void DrawMap(Map &map)
 {
-    DrawTexture(map.background, 0, 0, WHITE);
+    // DrawTexture(map.background, 0, 0, WHITE);
 
-    Rectangle source;
-    Rectangle destination;
+    
+
+    // Rectangle source;
+    // Rectangle destination;
 
     for(int i = 0; i < map.blueCount; i++)
     {
-        source = {0, 0, (float)map.blue[i].texture.width, (float)map.blue[i].texture.height};
+        // source = {0, 0, (float)map.blue[i].texture.width, (float)map.blue[i].texture.height};
 
-        destination = map.blue[i].body;
+        // destination = map.blue[i].body;
 
-        DrawTexturePro(map.blue[i].texture, source, destination, {0,0}, 0, WHITE);
+        // DrawTexturePro(map.blue[i].texture, source, destination, {0,0}, 0, WHITE);
+
+        DrawRectangleRec(map.blue[i].body, BLUE);
+
     }
 
     for(int i = 0; i < map.yellowCount; i++)
     {
         if(!map.yellow[i].broken)
         {
-            source = {0, 0, (float)map.yellow[i].texture.width, (float)map.yellow[i].texture.height};
+            // source = {0, 0, (float)map.yellow[i].texture.width, (float)map.yellow[i].texture.height};
 
-            destination = map.yellow[i].body;
+            // destination = map.yellow[i].body;
 
-            DrawTexturePro(map.yellow[i].texture, source, destination, {0,0}, 0, WHITE);
-        }
+        //     DrawTexturePro(map.yellow[i].texture, source, destination, {0,0}, 0, WHITE);
+            
+            DrawRectangleRec(map.yellow[i].body, YELLOW);
+    }
     }
 
     for(int i = 0; i < map.greenCount; i++)
     {
-        source = {0, 0, (float)map.green[i].texture.width, (float)map.green[i].texture.height};
+        // source = {0, 0, (float)map.green[i].texture.width, (float)map.green[i].texture.height};
 
-        destination = map.green[i].body;
+        // destination = map.green[i].body;
 
-        DrawTexturePro(map.green[i].texture, source, destination, {0,0}, 0, WHITE);
+        // DrawTexturePro(map.green[i].texture, source, destination, {0,0}, 0, WHITE);
     }
 
     for(int i = 0; i < map.redCount; i++)
     {
-        source = {0, 0, (float)map.red[i].texture.width, (float)map.red[i].texture.height};
+        // source = {0, 0, (float)map.red[i].texture.width, (float)map.red[i].texture.height};
 
-        destination = map.red[i].body;
+        // destination = map.red[i].body;
 
-        DrawTexturePro(map.red[i].texture, source, destination, {0,0}, 0, WHITE);
+        // DrawTexturePro(map.red[i].texture, source, destination, {0,0}, 0, WHITE);        
+
     }
 }
