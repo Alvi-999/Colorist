@@ -45,7 +45,7 @@ void RedCollision(Player &player, Map &map)
 
 void YellowCollision(Player &player, Map &map)
 {
-    for(int i = 0; i < map.redCount; i++)
+    for(int i = 0; i < map.yellowCount; i++)
     {
         if(CheckCollisionRecs(player.body, map.yellow[i].body))
         {

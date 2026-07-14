@@ -84,7 +84,7 @@ void InputHandling(Player &player)
         player.facingRight = true;
     }
 
-    if(IsKeyDown(KEY_D))
+    if(IsKeyDown(KEY_A))
     {
         player.velocity.x = -MOVE_SPEED;    
         player.facingRight = false;
@@ -139,16 +139,19 @@ void UpdatePlayerState(Player &player)
 
 void DrawPlayer(Player &player)
 {
-    Rectangle source = {0, 0, (float)player.sprite.width, (float)player.sprite.height};
+    // Rectangle source = {0, 0, (float)player.sprite.width, (float)player.sprite.height};
 
-    if(!player.facingRight)
-    {
-        source.width *= -1;
-    }
+    // if(!player.facingRight)
+    // {
+    //     source.width *= -1;
+    // }
 
-    Rectangle destination = {player.position.x, player.position.y, player.width, player.height};
+    // Rectangle destination = {player.position.x, player.position.y, player.width, player.height};
 
-    DrawTexturePro(player.sprite, source, destination, {0, 0}, 0, WHITE);
+    // DrawTexturePro(player.sprite, source, destination, {0, 0}, 0, WHITE);
+
+    DrawRectangleRec(player.body, WHITE);
+    
 }
 
 void UpdateMovement(Player &player)

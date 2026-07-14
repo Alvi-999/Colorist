@@ -13,10 +13,10 @@ void UpdateGame(Player &player, Map &map)
     UpdateMovement(player);
 
     //collision
-    // GreenCollision(player, map);
-    // RedCollision(player, map);
-    // YellowCollision(player, map);
-    // BlueCollision(player, map);
+    GreenCollision(player, map);
+    RedCollision(player, map);
+    YellowCollision(player, map);
+    BlueCollision(player, map);
 
     //animation state
     UpdatePlayerState(player);

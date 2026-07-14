@@ -52,52 +52,52 @@ struct Map
 
 void LoadMap(Map &map)
 {
-    map.background = LoadTexture("assets/background/bg.png");
+    // map.background = LoadTexture("assets/background/bg.png");
 
-    map.blue[0].body;
-    map.blue[0].texture = LoadTexture("assets/");
+    // map.blue[0].body;
+    // map.blue[0].texture = LoadTexture("assets/");
 
-    map.blue[1].body;
-    map.blue[1].texture = LoadTexture("assets/platforms/floatb22.png");
+    // map.blue[1].body;
+    // map.blue[1].texture = LoadTexture("assets/platforms/floatb22.png");
 
-    map.yellow[0].body;
-    map.yellow[0].texture = LoadTexture("assets/platforms/yellow1.png");
+    // map.yellow[0].body;
+    // map.yellow[0].texture = LoadTexture("assets/platforms/yellow1.png");
 
-    map.yellow[1].body;
-    map.yellow[1].texture = LoadTexture("assets/platforms/yellow2.png");
+    // map.yellow[1].body;
+    // map.yellow[1].texture = LoadTexture("assets/platforms/yellow2.png");
 
-    map.green[0].body;
-    map.green[0].texture = LoadTexture("assets/platforms/groundbg1.png");
+    // map.green[0].body;
+    // map.green[0].texture = LoadTexture("assets/platforms/groundbg1.png");
 
-    map.green[1].body;
-    map.green[1].texture = LoadTexture("assets/platforms/groundg2.png");
+    // map.green[1].body;
+    // map.green[1].texture = LoadTexture("assets/platforms/groundg2.png");
 
     // map.blueCount = 2;
     // map.greenCount = 2;
     // map.yellowCount = 2;
     // map.redCount = 2;
 
-    // map.greenCount = 2;
-    // map.redCount = 1;
-    // map.blueCount = 1;
-    // map.yellowCount = 1;
+    map.greenCount = 2;
+    map.redCount = 1;
+    map.blueCount = 1;
+    map.yellowCount = 1;
 
-    // map.yellow[0].broken = false;
+    map.yellow[0].broken = false;
 
-    // // Ground
-    // map.green[0].body = {0, 650, 1000, 70};
+    // Ground
+    map.green[0].body = {0, 650, 1000, 70};
 
-    // // Floating platform
-    // map.green[1].body = {300, 500, 200, 40};
+    // Floating platform
+    map.green[1].body = {300, 500, 200, 40};
 
-    // // Red platform
-    // map.red[0].body = {650, 420, 200, 40};
+    // Red platform
+    map.red[0].body = {650, 420, 200, 40};
 
-    // // Blue platform
-    // map.blue[0].body = {1000, 350, 200, 40};
+    // Blue platform
+    map.blue[0].body = {1000, 350, 200, 40};
 
-    // // Yellow platform
-    // map.yellow[0].body = {1350, 280, 200, 40};
+    // Yellow platform
+    map.yellow[0].body = {1350, 280, 200, 40};
 }
 
 void UnloadMap(Map &map)
@@ -145,7 +145,7 @@ void DrawMap(Map &map)
         //     DrawTexturePro(map.yellow[i].texture, source, destination, {0,0}, 0, WHITE);
             
             DrawRectangleRec(map.yellow[i].body, YELLOW);
-    }
+        }
     }
 
     for(int i = 0; i < map.greenCount; i++)
@@ -155,6 +155,8 @@ void DrawMap(Map &map)
         // destination = map.green[i].body;
 
         // DrawTexturePro(map.green[i].texture, source, destination, {0,0}, 0, WHITE);
+    
+        DrawRectangleRec(map.green[i].body, GREEN);
     }
 
     for(int i = 0; i < map.redCount; i++)
@@ -164,6 +166,6 @@ void DrawMap(Map &map)
         // destination = map.red[i].body;
 
         // DrawTexturePro(map.red[i].texture, source, destination, {0,0}, 0, WHITE);        
-
+        DrawRectangleRec(map.red[i].body, RED);
     }
 }
