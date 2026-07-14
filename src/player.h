@@ -10,12 +10,15 @@ const float MOVE_SPEED = 5.0f;
 const float JUMP_FORCE = -18.0f;
 
 // Player states
-const int IDLE = 0;
-const int RUN = 1;
-const int JUMP = 2;
-const int FALL = 3;
-const int ATTACK = 4;
-const int DASH = 5;
+const int IDLEL = 0;
+const int IDLER = 1;
+const int RUNL = 2;
+const int RUNR = 3;
+const int JUMPL = 4;
+const int JUMPR = 5;
+const int FALL = 6;
+const int ATTACK = 7;
+const int DASH = 8;
 
 const int MAX_HITS = 5;
 
