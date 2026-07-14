@@ -45,3 +45,40 @@ struct Player
     int hits;
 };
 
+void InitializePlayer(Player &player)
+{
+    player.position = {100, 300};
+
+    player.velocity = {0, 0};
+
+    player.width = 64;
+    player.height = 64;
+
+    player.body =
+    {
+        player.position.x,
+        player.position.y,
+        player.width,
+        player.height
+    };
+
+    player.attack =
+    {
+        player.position.x,
+        player.position.y,
+        50,
+        30
+    };
+
+    player.sprite = LoadTexture("assets/player/idle_right.png");
+
+    player.facingRight = true;
+
+    player.grounded = false;
+
+    player.doubleJumpAvailable = true;
+
+    player.state = IDLE;
+
+    player.hits = MAX_HITS;
+}
