@@ -46,7 +46,15 @@ struct Player
     int state;
 
     int hits;
+
+    int framecount;
 };
+
+//animation functioncalls
+Texture2D IdleRightAnimation(Player &player);
+Texture2D IdleLeftAnimation(Player &player);
+Texture2D RunRightAnimation(Player &player);
+Texture2D RunLeftAnimation(Player &player);
 
 void InitializePlayer(Player &player)
 {
@@ -61,7 +69,7 @@ void InitializePlayer(Player &player)
 
     player.attack = {player.position.x, player.position.y, 50, 30};
 
-    player.sprite = LoadTexture("assets/player/idle_right.png");
+    player.sprite = LoadTexture("assets/decoration/idle_right1.png");
 
     player.facingRight = true;
 
@@ -72,6 +80,8 @@ void InitializePlayer(Player &player)
     player.state = IDLER;
 
     player.hits = MAX_HITS;
+
+    player.framecount=0;
 }
 
 void InputHandling(Player &player)
@@ -110,6 +120,7 @@ void InputHandling(Player &player)
 void UpdatePlayerState(Player &player)
 {
     //if jumping
+    int previous_state = player.state;
     if(player.velocity.y < 0)
     {
         if(player.facingRight) player.state = JUMPR;
@@ -135,6 +146,11 @@ void UpdatePlayerState(Player &player)
         if(player.facingRight) player.state = IDLER;
         else player.state = IDLEL;
     }
+
+    if (previous_state != player.state)
+    {
+        player.framecount = 0;
+    }
 }
 
 void DrawPlayer(Player &player)
@@ -144,20 +160,26 @@ void DrawPlayer(Player &player)
     //depending on the state of player 
     //animation will run
 
+    player.framecount++;
+    player.framecount = (player.framecount)%60;
 
-    (JUST PUT THE FUNCTION TO THE ANIMATIONS HERE)
-    /*switch(player.state)
+    //(JUST PUT THE FUNCTION TO THE ANIMATIONS HERE)
+    switch(player.state)
     {
         case IDLER:
+            player.sprite = IdleRightAnimation(player);
             break;
 
         case IDLEL:
+            player.sprite = IdleLeftAnimation(player);
             break;
 
         case RUNR:
+            player.sprite = RunRightAnimation(player);
             break;
 
         case RUNL:
+            player.sprite = RunLeftAnimation(player);
             break;
         
         case JUMPL:
@@ -166,11 +188,13 @@ void DrawPlayer(Player &player)
         case FALL:
             break;
 
-    }*/
-    
+    }
 
-    DrawRectangleRec(player.body, WHITE);
-    
+    Rectangle source = {0, 0, (float)player.sprite.width, (float)player.sprite.height};
+
+    Rectangle dest = {player.position.x, player.position.y, player.width, player.height};
+
+    DrawTexturePro(player.sprite, source, dest, {0, 0}, 0.0f, WHITE);
 }
 
 void UpdateMovement(Player &player)
@@ -184,4 +208,263 @@ void UpdateMovement(Player &player)
 
     player.position.y += player.velocity.y;
     player.body.y = player.position.y;
+}
+
+
+
+// --------------Animation------------------------------
+Texture2D IdleRightAnimation(Player &player)
+{
+    if(player.framecount>=0 && player.framecount<5)
+    {
+        Texture2D SpriteImage = LoadTexture("idler/idler-1.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=5 && player.framecount<10)
+    {
+        Texture2D SpriteImage = LoadTexture("idler/idler-2.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=10 && player.framecount<15)
+    {
+        Texture2D SpriteImage = LoadTexture("idler/idler-3.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=15 && player.framecount<20)
+    {
+        Texture2D SpriteImage = LoadTexture("idler/idler-4.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=20 && player.framecount<25)
+    {
+        Texture2D SpriteImage = LoadTexture("idler/idler-5.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=25 && player.framecount<30)
+    {
+        Texture2D SpriteImage = LoadTexture("idler/idler-6.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=30 && player.framecount<35)
+    {
+        Texture2D SpriteImage = LoadTexture("idler/idler-7.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=35 && player.framecount<40)
+    {
+        Texture2D SpriteImage = LoadTexture("idler/idler-8.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=40 && player.framecount<45)
+    {
+        Texture2D SpriteImage = LoadTexture("idler/idler-9.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=45 && player.framecount<50)
+    {
+        Texture2D SpriteImage = LoadTexture("idler/idler-10.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=50 && player.framecount<55)
+    {
+        Texture2D SpriteImage = LoadTexture("idler/idler-11.png");
+        return SpriteImage;
+    }
+    else
+    {
+        Texture2D SpriteImage = LoadTexture("idler/idler-12.png");
+        return SpriteImage;
+    }
+}
+
+Texture2D IdleLeftAnimation(Player &player)
+{
+    if(player.framecount>=0 && player.framecount<5)
+    {
+        Texture2D SpriteImage = LoadTexture("idlel/idlel-1.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=5 && player.framecount<10)
+    {
+        Texture2D SpriteImage = LoadTexture("idlel/idlel-2.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=10 && player.framecount<15)
+    {
+        Texture2D SpriteImage = LoadTexture("idlel/idlel-3.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=15 && player.framecount<20)
+    {
+        Texture2D SpriteImage = LoadTexture("idlel/idlel-4.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=20 && player.framecount<25)
+    {
+        Texture2D SpriteImage = LoadTexture("idlel/idlel-5.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=25 && player.framecount<30)
+    {
+        Texture2D SpriteImage = LoadTexture("idlel/idlel-6.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=30 && player.framecount<35)
+    {
+        Texture2D SpriteImage = LoadTexture("idlel/idlel-7.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=35 && player.framecount<40)
+    {
+        Texture2D SpriteImage = LoadTexture("idlel/idlel-8.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=40 && player.framecount<45)
+    {
+        Texture2D SpriteImage = LoadTexture("idlel/idlel-9.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=45 && player.framecount<50)
+    {
+        Texture2D SpriteImage = LoadTexture("idlel/idlel-10.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=50 && player.framecount<55)
+    {
+        Texture2D SpriteImage = LoadTexture("idlel/idlel-11.png");
+        return SpriteImage;
+    }
+    else
+    {
+        Texture2D SpriteImage = LoadTexture("idlel/idlel-12.png");
+        return SpriteImage;
+    }
+}
+
+Texture2D RunRightAnimation(Player &player)
+{
+    if(player.framecount>=0 && player.framecount<5)
+    {
+        Texture2D SpriteImage = LoadTexture("runr/runr-1.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=5 && player.framecount<10)
+    {
+        Texture2D SpriteImage = LoadTexture("runr/runr-2.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=10 && player.framecount<15)
+    {
+        Texture2D SpriteImage = LoadTexture("runr/runr-3.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=15 && player.framecount<20)
+    {
+        Texture2D SpriteImage = LoadTexture("runr/runr-4.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=20 && player.framecount<25)
+    {
+        Texture2D SpriteImage = LoadTexture("runr/runr-5.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=25 && player.framecount<30)
+    {
+        Texture2D SpriteImage = LoadTexture("runr/runr-6.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=30 && player.framecount<35)
+    {
+        Texture2D SpriteImage = LoadTexture("runr/runr-7.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=35 && player.framecount<40)
+    {
+        Texture2D SpriteImage = LoadTexture("runr/runr-8.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=40 && player.framecount<45)
+    {
+        Texture2D SpriteImage = LoadTexture("runr/runr-9.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=45 && player.framecount<50)
+    {
+        Texture2D SpriteImage = LoadTexture("runr/runr-10.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=50 && player.framecount<55)
+    {
+        Texture2D SpriteImage = LoadTexture("runr/runr-11.png");
+        return SpriteImage;
+    }
+    else
+    {
+        Texture2D SpriteImage = LoadTexture("runr/runr-12.png");
+        return SpriteImage;
+    }
+}
+
+Texture2D RunLeftAnimation(Player &player)
+{
+    if(player.framecount>=0 && player.framecount<5)
+    {
+        Texture2D SpriteImage = LoadTexture("runl/runl-1.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=5 && player.framecount<10)
+    {
+        Texture2D SpriteImage = LoadTexture("runl/runl-2.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=10 && player.framecount<15)
+    {
+        Texture2D SpriteImage = LoadTexture("runl/runl-3.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=15 && player.framecount<20)
+    {
+        Texture2D SpriteImage = LoadTexture("runl/runl-4.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=20 && player.framecount<25)
+    {
+        Texture2D SpriteImage = LoadTexture("runl/runl-5.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=25 && player.framecount<30)
+    {
+        Texture2D SpriteImage = LoadTexture("runl/runl-6.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=30 && player.framecount<35)
+    {
+        Texture2D SpriteImage = LoadTexture("runl/runl-7.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=35 && player.framecount<40)
+    {
+        Texture2D SpriteImage = LoadTexture("runl/runl-8.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=40 && player.framecount<45)
+    {
+        Texture2D SpriteImage = LoadTexture("runl/runl-9.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=45 && player.framecount<50)
+    {
+        Texture2D SpriteImage = LoadTexture("runl/runl-10.png");
+        return SpriteImage;
+    }
+    else if(player.framecount>=50 && player.framecount<55)
+    {
+        Texture2D SpriteImage = LoadTexture("runl/runl-11.png");
+        return SpriteImage;
+    }
+    else
+    {
+        Texture2D SpriteImage = LoadTexture("runl/runl-12.png");
+        return SpriteImage;
+    }
 }
