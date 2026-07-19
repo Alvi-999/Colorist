@@ -4,18 +4,18 @@
 #include "map.h"
 #include "game.h"
 
-void LandPlayer(Player &player, Rectangle platform)
-{
-    player.position.y = platform.y - player.body.height;
+// void LandPlayer(Player &player, Rectangle platform)
+// {
+//     player.position.y = platform.y - player.body.height;
 
-    player.velocity.y = 0;
+//     player.velocity.y = 0;
 
-    player.grounded = true;
+//     player.grounded = true;
 
-    player.doubleJumpAvailable = true;
+//     player.doubleJumpAvailable = true;
 
-    player.body.y = player.position.y;
-}
+//     player.body.y = player.position.y;
+// }
 
 void GreenCollision(Player &player, Map &map)
 {

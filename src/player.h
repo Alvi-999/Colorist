@@ -50,7 +50,7 @@ struct Player
     int framecount;
 };
 
-//animation functioncalls
+//animation functions
 Texture2D IdleRightAnimation(Player &player);
 Texture2D IdleLeftAnimation(Player &player);
 Texture2D RunRightAnimation(Player &player);
