@@ -6,6 +6,8 @@ constexpr int COLLISION_BOTTOM = 2;
 constexpr int COLLISION_LEFT = 3;
 constexpr int COLLISION_RIGHT = 4;
 
+constexpr int YELLOW_BREAK_TIME = 37;
+
 // Physics constants
 constexpr float GRAVITY = 1.00f;
 constexpr float MOVE_SPEED = 3.5f;

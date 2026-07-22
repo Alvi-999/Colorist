@@ -18,7 +18,8 @@ struct Yellow
     Rectangle body;
     Texture2D texture;
 
-    bool broken;
+    bool broken = false;
+    int breakTimer = 0;
 };
 
 struct Red
@@ -50,27 +51,27 @@ struct Map
 
 void LoadMap(Map &map)
 {
-    map.greenCount = 2;
+    map.greenCount = 1;
     map.redCount = 1;
     map.blueCount = 1;
-    map.yellowCount = 1;
-
-    map.yellow[0].broken = false;
+    map.yellowCount = 2;
 
     // Ground
     map.green[0].body = {0, 650, 1000, 70};
 
     // Floating platform
-    map.green[1].body = {300, 500, 200, 40};
+    map.yellow[0].body = {300, 500, 200, 40};
 
     // Red platform
     map.red[0].body = {650, 420, 200, 40};
 
     // Blue platform
     map.blue[0].body = {1000, 350, 200, 40};
+    map.blue[0].buoyancy = 2.0f;
 
     // Yellow platform
-    map.yellow[0].body = {1350, 280, 200, 40};
+    map.yellow[1].body = {1350, 280, 200, 40};
+    map.yellow[1].broken = false;
 }
 
 void UnloadMap(Map &map)

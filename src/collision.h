@@ -3,15 +3,9 @@
 #include <raylib.h>
 #include "player.h"
 #include "map.h"
+#include "constants.h"
 
-//collision directions
-const int COLLISION_NONE = 0;
-const int COLLISION_TOP = 1;
-const int COLLISION_BOTTOM = 2;
-const int COLLISION_LEFT = 3;
-const int COLLISION_RIGHT = 4;
-
-bool isCollidiing(Player &player, Rectangle &platform)
+bool IsColliding(Player &player, Rectangle &platform)
 {
     return CheckCollisionRecs(player.body, platform);
 }
@@ -105,7 +99,7 @@ void GreenCollision(Player &player,Map &map)
     {
         Rectangle &platform = map.green[i].body;
 
-        if(isCollidiing(player, platform))
+        if(IsColliding(player, platform))
         {
             int side = GetCollisionSide(player, platform);
 
@@ -119,7 +113,7 @@ void RedCollision(Player &player,Map &map)
     {
         Rectangle &platform = map.red[i].body;
 
-        if(isCollidiing(player, platform))
+        if(IsColliding(player, platform))
         {
             int side = GetCollisionSide(player, platform);
 
@@ -127,31 +121,73 @@ void RedCollision(Player &player,Map &map)
         }
     }
 }
+
 void YellowCollision(Player &player, Map &map)
 {
     for(int i = 0; i < map.yellowCount; i++)
     {
-        Rectangle &platform = map.yellow[i].body;
+        if (map.yellow[i].broken) continue;
 
-        if(isCollidiing(player, platform))
+        Rectangle &platform = map.yellow[i].body;
+        if (IsColliding(player, platform))
         {
             int side = GetCollisionSide(player, platform);
 
-            ResolveCollision(player, platform, side);
+            ResolveCollision(player, map.yellow[i].body, side);
+
+            if((map.yellow[i].breakTimer == 0) and (side == COLLISION_TOP))
+            {
+                map.yellow[i].breakTimer = YELLOW_BREAK_TIME;
+            }
         }
     }
 }
-void BlueCollision(Player &player,Map &map)
+
+void BlueCollision(Player &player, Map &map)
 {
+    player.inWater = false;
+
     for(int i = 0; i < map.blueCount; i++)
     {
-        Rectangle &platform = map.blue[i].body;
+        Blue &water = map.blue[i];
 
-        if(isCollidiing(player, platform))
+        if(IsColliding(player, water.body))
         {
-            int side = GetCollisionSide(player, platform);
+            player.inWater = true;
 
-            ResolveCollision(player, platform, side);
+            float surface = water.body.y - player.body.height;
+
+            if(player.body.y >= surface)
+            {
+                // Player is below the surface -> float upward
+                player.velocity.y -= water.buoyancy;
+            }
+            else
+            {
+                // Keep the player on the surface
+                player.body.y = surface;
+                player.position.y = surface;
+                player.velocity.y = 0;
+            }
+        }
+    }
+}
+
+void UpdateYellowPlatforms(Map &map)
+{
+    for (int i = 0; i < map.yellowCount; i++)
+    {
+        if (map.yellow[i].broken)
+            continue;
+
+        if (map.yellow[i].breakTimer > 0)
+        {
+            map.yellow[i].breakTimer--;
+
+            if (map.yellow[i].breakTimer == 0)
+            {
+                map.yellow[i].broken = true;
+            }
         }
     }
 }

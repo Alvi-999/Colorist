@@ -2,25 +2,7 @@
 
 #include <raylib.h>
 #include <bits/stdc++.h>
-
-
-// Physics constants
-const float GRAVITY = 1.00f;
-const float MOVE_SPEED = 3.5f;
-const float JUMP_FORCE = -18.0f;
-
-// Player states
-const int IDLEL = 0;
-const int IDLER = 1;
-const int RUNL = 2;
-const int RUNR = 3;
-const int JUMPL = 4;
-const int JUMPR = 5;
-const int FALL = 6;
-const int ATTACK = 7;
-const int DASH = 8;
-
-const int MAX_HITS = 5;
+#include "constants.h"
 
 
 struct Player
@@ -48,6 +30,8 @@ struct Player
     int hits;
 
     int framecount;
+
+    bool inWater;
 };
 
 //animation functions
@@ -101,7 +85,7 @@ void InputHandling(Player &player)
     }
 
     //first jump
-    if(IsKeyPressed(KEY_W) && player.grounded)
+    if(IsKeyPressed(KEY_W) and player.grounded and !player.inWater)
     {
         player.velocity.y = JUMP_FORCE;
 
@@ -109,7 +93,7 @@ void InputHandling(Player &player)
     }
     
     //the second jump
-    else if(IsKeyPressed(KEY_W) && !player.grounded && player.doubleJumpAvailable)
+    else if(IsKeyPressed(KEY_W) and !player.grounded and player.doubleJumpAvailable and !player.inWater)
     {
         player.doubleJumpAvailable = false;
 
