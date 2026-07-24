@@ -1,10 +1,8 @@
-#include <bits/stdc++.h>
+#include <stdio.h>
 #include <raylib.h>
 #include "player.h"
 #include "game.h"
 #include "map.h"
-
-using namespace std;
 
 int main()
 {
