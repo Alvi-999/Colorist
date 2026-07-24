@@ -7,19 +7,18 @@
 
 void UpdateGame(Player &player, Map &map)
 {
-    //read keyboard & mouse
     InputHandling(player);
-
     UpdateMovement(player);
 
-    //collision
     GreenCollision(player, map);
     RedCollision(player, map);
     YellowCollision(player, map);
     BlueCollision(player, map);
 
-    //animation state
-    UpdatePlayerState(player);
+    UpdateYellowPlatforms(map);   // <-- here
+
+    DrawMap(map);
+    DrawPlayer(player);
 }
 
 void DrawGame(Player &player, Map &map)
