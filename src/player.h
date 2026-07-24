@@ -1,7 +1,7 @@
 #pragma once
 
 #include <raylib.h>
-#include <bits/stdc++.h>
+#include <stdio.h>
 #include "constants.h"
 
 

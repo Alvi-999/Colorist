@@ -9,9 +9,9 @@ constexpr int COLLISION_RIGHT = 4;
 constexpr int YELLOW_BREAK_TIME = 37;
 
 // Physics constants
-constexpr float GRAVITY = 1.00f;
-constexpr float MOVE_SPEED = 3.5f;
-constexpr float JUMP_FORCE = -18.0f;
+constexpr float GRAVITY = 5.00f;
+constexpr float MOVE_SPEED = 5.0f;
+constexpr float JUMP_FORCE = -25.0f;
 
 // Player states
 constexpr int IDLEL = 0;
