@@ -11,6 +11,7 @@ cmake_install.cmake
 Makefile
 
 # Executables
+.exe
 
 # Object files
 *.o
