@@ -5,7 +5,7 @@
 #include "map.h"
 #include "collision.h"
 
-void UpdateGame(Player &player, Map &map)
+void UpdateGame(Player *player, Map *map)
 {
     InputHandling(player);
     UpdateMovement(player);
@@ -21,7 +21,7 @@ void UpdateGame(Player &player, Map &map)
     DrawPlayer(player);
 }
 
-void DrawGame(Player &player, Map &map)
+void DrawGame(Player *player, Map *map)
 {
     DrawMap(map);
 

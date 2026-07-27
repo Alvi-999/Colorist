@@ -3,38 +3,36 @@
 #include <stdio.h>
 #include <raylib.h>
 
-using namespace std;
-
-struct Blue
+typedef struct Blue
 {
     Rectangle body;
     Texture2D texture;
 
     float buoyancy;
-};
+} Blue;
 
-struct Yellow
+typedef struct Yellow
 {
     Rectangle body;
     Texture2D texture;
 
-    bool broken = false;
-    int breakTimer = 0;
-};
+    bool broken;
+    int breakTimer;
+} Yellow;
 
-struct Red
+typedef struct Red
 {
     Rectangle body;
     Texture2D texture;
-};
+} Red;
 
-struct Green
+typedef struct Green
 {
     Rectangle body;
     Texture2D texture;
-};
+} Green;
 
-struct Map
+typedef struct Map
 {
     Texture2D background;
 
@@ -47,69 +45,70 @@ struct Map
     int yellowCount;
     int redCount;
     int greenCount;
-};
+} Map;
 
-void LoadMap(Map &map)
+void LoadMap(Map *map)
 {
-    map.greenCount = 1;
-    map.redCount = 1;
-    map.blueCount = 1;
-    map.yellowCount = 2;
+    map->greenCount = 1;
+    map->redCount = 1;
+    map->blueCount = 1;
+    map->yellowCount = 2;
 
     // Ground
-    map.green[0].body = {0, 650, 1000, 70};
+    map->green[0].body = (Rectangle){0, 650, 1000, 70};
 
     // Floating platform
-    map.yellow[0].body = {300, 500, 200, 40};
+    map->yellow[0].body = (Rectangle){300, 500, 200, 40};
 
     // Red platform
-    map.red[0].body = {650, 420, 200, 40};
+    map->red[0].body = (Rectangle){650, 420, 200, 40};
 
     // Blue platform
-    map.blue[0].body = {1000, 350, 200, 40};
-    map.blue[0].buoyancy = 2.0f;
+    map->blue[0].body = (Rectangle){1000, 350, 200, 40};
+    map->blue[0].buoyancy = 2.0f;
 
     // Yellow platform
-    map.yellow[1].body = {1350, 280, 200, 40};
-    map.yellow[1].broken = false;
+    map->yellow[1].body = (Rectangle){1350, 280, 200, 40};
+    map->yellow[1].broken = false;
+    map->yellow[1].breakTimer = 0;
 }
 
-void UnloadMap(Map &map)
+void UnloadMap(Map *map)
 {
-    UnloadTexture(map.background);
+    UnloadTexture(map->background);
 
-    for(int i = 0; i < map.blueCount; i++) UnloadTexture(map.blue[i].texture);
+    for(int i = 0; i < map->blueCount; i++) UnloadTexture(map->blue[i].texture);
     
-    for(int i = 0; i < map.yellowCount; i++) UnloadTexture(map.yellow[i].texture);
+    for(int i = 0; i < map->yellowCount; i++) UnloadTexture(map->yellow[i].texture);
 
-    for(int i = 0; i < map.greenCount; i++) UnloadTexture(map.green[i].texture);
+    for(int i = 0; i < map->greenCount; i++) UnloadTexture(map->green[i].texture);
 
-    for(int i = 0; i < map.redCount; i++) UnloadTexture(map.red[i].texture);
+    for(int i = 0; i < map->redCount; i++) UnloadTexture(map->red[i].texture);
 }
 
-void DrawMap(Map &map)
+void DrawMap(Map *map)
 {
-    for(int i = 0; i < map.blueCount; i++)
+    for(int i = 0; i < map->blueCount; i++)
     {
-        DrawRectangleRec(map.blue[i].body, BLUE);
+        DrawRectangleRec(map->blue[i].body, BLUE);
 
     }
 
-    for(int i = 0; i < map.yellowCount; i++)
+    for(int i = 0; i < map->yellowCount; i++)
     {
-        if(!map.yellow[i].broken)
+        if(!map->yellow[i].broken)
         {
-            DrawRectangleRec(map.yellow[i].body, YELLOW);
+            DrawRectangleRec(map->yellow[i].body, YELLOW);
         }
     }
 
-    for(int i = 0; i < map.greenCount; i++)
+    for(int i = 0; i < map->greenCount; i++)
     {
-        DrawRectangleRec(map.green[i].body, GREEN);
+        DrawRectangleRec(map->green[i].body, GREEN);
     }
 
-    for(int i = 0; i < map.redCount; i++)
+    for(int i = 0; i < map->redCount; i++)
     {        
-        DrawRectangleRec(map.red[i].body, RED);
+        DrawRectangleRec(map->red[i].body, RED);
     }
 }
