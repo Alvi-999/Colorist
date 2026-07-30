@@ -1,21 +1,23 @@
 #pragma once
 
+#include <math.h>
 #include <raylib.h>
 #include "player.h"
 #include "map.h"
 #include "constants.h"
+#include "cpphelper.h"
 
-bool IsColliding(Player &player, Rectangle &platform)
+bool IsColliding(Player *player, Rectangle platform)
 {
-    return CheckCollisionRecs(player.body, platform);
+    return CheckCollisionRecs(player->body, platform);
 }
 
-int GetCollisionSide(Player &player, Rectangle &platform)
+int GetCollisionSide(Player *player, Rectangle platform)
 {
-    float playerLeft = player.body.x;
-    float playerRight = player.body.x + player.body.width;
-    float playerTop = player.body.y;
-    float playerBottom = player.body.y + player.body.height;
+    float playerLeft = player->body.x;
+    float playerRight = player->body.x + player->body.width;
+    float playerTop = player->body.y;
+    float playerBottom = player->body.y + player->body.height;
 
     float platformLeft = platform.x;
     float platformRight = platform.x + platform.width;
@@ -42,151 +44,151 @@ int GetCollisionSide(Player &player, Rectangle &platform)
         else return COLLISION_RIGHT;
     }
 
-    if (fabs(player.velocity.y) >= fabs(player.velocity.x))
+    if (fabs(player->velocity.y) >= fabs(player->velocity.x))
     {
-        if (player.velocity.y > 0) return COLLISION_TOP;
+        if (player->velocity.y > 0) return COLLISION_TOP;
         else return COLLISION_BOTTOM;
     }
     else
     {
-        if (player.velocity.x > 0) return COLLISION_LEFT;
+        if (player->velocity.x > 0) return COLLISION_LEFT;
         else return COLLISION_RIGHT;
     }
 }
 
 
-void ResolveCollision(Player &player, Rectangle &platform, int side)
+void ResolveCollision(Player *player, Rectangle *platform, int side)
 {
     if(side == COLLISION_TOP)
     {
-        player.body.y = platform.y - player.body.height;
-        player.position.y = player.body.y;
+        player->body.y = platform->y - player->body.height;
+        player->position.y = player->body.y;
 
-        player.velocity.y = 0;
+        player->velocity.y = 0;
 
-        player.grounded = true;
-        player.doubleJumpAvailable = true;
+        player->grounded = true;
+        player->doubleJumpAvailable = true;
     }
 
     else if(side == COLLISION_BOTTOM)
     {
-        player.body.y = platform.y + platform.height;
-        player.position.y = player.body.y;
+        player->body.y = platform->y + platform->height;
+        player->position.y = player->body.y;
 
-        player.velocity.y = 0;
+        player->velocity.y = 0;
     }
 
     else if(side == COLLISION_LEFT)
     {
-        player.body.x = platform.x - player.body.width;
-        player.position.x = player.body.x;
+        player->body.x = platform->x - player->body.width;
+        player->position.x = player->body.x;
 
-        player.velocity.x = 0;
+        player->velocity.x = 0;
     }
 
     else if(side == COLLISION_RIGHT)
     {
-        player.body.x = platform.x + platform.width;
-        player.position.x = player.body.x;
+        player->body.x = platform->x + platform->width;
+        player->position.x = player->body.x;
 
-        player.velocity.x = 0;
+        player->velocity.x = 0;
     }
 }
 
-void GreenCollision(Player &player,Map &map)
+void GreenCollision(Player *player,Map *map)
 {
-    for(int i = 0; i < map.greenCount; i++)
+    for(int i = 0; i < map->greenCount; i++)
     {
-        Rectangle &platform = map.green[i].body;
+        Rectangle platform = map->green[i].body;
 
         if(IsColliding(player, platform))
         {
             int side = GetCollisionSide(player, platform);
 
-            ResolveCollision(player, platform, side);
+            ResolveCollision(player, &platform, side);
         }
     }
 }
-void RedCollision(Player &player,Map &map)
+void RedCollision(Player *player,Map *map)
 {
-    for(int i = 0; i < map.redCount; i++)
+    for(int i = 0; i < map->redCount; i++)
     {
-        Rectangle &platform = map.red[i].body;
+        Rectangle platform = map->red[i].body;
 
         if(IsColliding(player, platform))
         {
             int side = GetCollisionSide(player, platform);
 
-            ResolveCollision(player, platform, side);
+            ResolveCollision(player, &platform, side);
         }
     }
 }
 
-void YellowCollision(Player &player, Map &map)
+void YellowCollision(Player *player, Map *map)
 {
-    for(int i = 0; i < map.yellowCount; i++)
+    for(int i = 0; i < map->yellowCount; i++)
     {
-        if (map.yellow[i].broken) continue;
+        if (map->yellow[i].broken) continue;
 
-        Rectangle &platform = map.yellow[i].body;
+        Rectangle platform = map->yellow[i].body;
         if (IsColliding(player, platform))
         {
             int side = GetCollisionSide(player, platform);
 
-            ResolveCollision(player, map.yellow[i].body, side);
+            ResolveCollision(player, &map->yellow[i].body, side);
 
-            if((map.yellow[i].breakTimer == 0) and (side == COLLISION_TOP))
+            if((map->yellow[i].breakTimer == 0) && (side == COLLISION_TOP))
             {
-                map.yellow[i].breakTimer = YELLOW_BREAK_TIME;
+                map->yellow[i].breakTimer = YELLOW_BREAK_TIME;
             }
         }
     }
 }
 
-void BlueCollision(Player &player, Map &map)
+void BlueCollision(Player *player, Map *map)
 {
-    player.inWater = false;
+    player->inWater = false;
 
-    for(int i = 0; i < map.blueCount; i++)
+    for(int i = 0; i < map->blueCount; i++)
     {
-        Blue &water = map.blue[i];
+        Blue water = map->blue[i];
 
         if(IsColliding(player, water.body))
         {
-            player.inWater = true;
+            player->inWater = true;
 
-            float surface = water.body.y - player.body.height;
+            float surface = water.body.y - player->body.height;
 
-            if(player.body.y >= surface)
+            if(player->body.y >= surface)
             {
                 // Player is below the surface -> float upward
-                player.velocity.y -= water.buoyancy;
+                player->velocity.y -= water.buoyancy;
             }
             else
             {
                 // Keep the player on the surface
-                player.body.y = surface;
-                player.position.y = surface;
-                player.velocity.y = 0;
+                player->body.y = surface;
+                player->position.y = surface;
+                player->velocity.y = 0;
             }
         }
     }
 }
 
-void UpdateYellowPlatforms(Map &map)
+void UpdateYellowPlatforms(Map *map)
 {
-    for (int i = 0; i < map.yellowCount; i++)
+    for (int i = 0; i < map->yellowCount; i++)
     {
-        if (map.yellow[i].broken)
+        if (map->yellow[i].broken)
             continue;
 
-        if (map.yellow[i].breakTimer > 0)
+        if (map->yellow[i].breakTimer > 0)
         {
-            map.yellow[i].breakTimer--;
+            map->yellow[i].breakTimer--;
 
-            if (map.yellow[i].breakTimer == 0)
+            if (map->yellow[i].breakTimer == 0)
             {
-                map.yellow[i].broken = true;
+                map->yellow[i].broken = true;
             }
         }
     }

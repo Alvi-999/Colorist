@@ -1,10 +1,8 @@
-#include <bits/stdc++.h>
+#include <stdio.h>
 #include <raylib.h>
 #include "player.h"
 #include "game.h"
 #include "map.h"
-
-using namespace std;
 
 int main()
 {
@@ -14,24 +12,24 @@ int main()
     Player player;
     Map map;
     
-    InitializePlayer(player);
+    InitializePlayer(&player);
 
-    LoadMap(map);
+    LoadMap(&map);
 
     while(!WindowShouldClose())
     {
-        UpdateGame(player, map);
+        UpdateGame(&player, &map);
 
         BeginDrawing();
 
         ClearBackground(BLACK);
 
-        DrawGame(player, map);
+        DrawGame(&player, &map);
 
         EndDrawing();
     }
 
-    UnloadMap(map);
+    UnloadMap(&map);
     UnloadTexture(player.sprite);
 
     CloseWindow();

@@ -1,27 +1,27 @@
 #pragma once
 
-constexpr int COLLISION_NONE = 0;
-constexpr int COLLISION_TOP = 1;
-constexpr int COLLISION_BOTTOM = 2;
-constexpr int COLLISION_LEFT = 3;
-constexpr int COLLISION_RIGHT = 4;
+const int COLLISION_NONE = 0;
+const int COLLISION_TOP = 1;
+const int COLLISION_BOTTOM = 2;
+const int COLLISION_LEFT = 3;
+const int COLLISION_RIGHT = 4;
 
-constexpr int YELLOW_BREAK_TIME = 37;
+const int YELLOW_BREAK_TIME = 37;
 
 // Physics constants
-constexpr float GRAVITY = 1.00f;
-constexpr float MOVE_SPEED = 3.5f;
-constexpr float JUMP_FORCE = -18.0f;
+const float GRAVITY = 5.00f;
+const float MOVE_SPEED = 10.0f;
+const float JUMP_FORCE = -50.0f;
 
 // Player states
-constexpr int IDLEL = 0;
-constexpr int IDLER = 1;
-constexpr int RUNL = 2;
-constexpr int RUNR = 3;
-constexpr int JUMPL = 4;
-constexpr int JUMPR = 5;
-constexpr int FALL = 6;
-constexpr int ATTACK = 7;
-constexpr int DASH = 8;
+const int IDLEL = 0;
+const int IDLER = 1;
+const int RUNL = 2;
+const int RUNR = 3;
+const int JUMPL = 4;
+const int JUMPR = 5;
+const int FALL = 6;
+const int ATTACK = 7;
+const int DASH = 8;
 
-constexpr int MAX_HITS = 5;
+const int MAX_HITS = 5;
