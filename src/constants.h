@@ -10,7 +10,7 @@ const int YELLOW_BREAK_TIME = 37;
 
 // Physics constants
 const float GRAVITY = 5.00f;
-const float MOVE_SPEED = 10.0f;
+const float MOVE_SPEED = 3.0f;
 const float JUMP_FORCE = -50.0f;
 
 // Player states

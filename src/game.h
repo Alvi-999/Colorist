@@ -9,6 +9,7 @@ void UpdateGame(Player *player, Map *map)
 {
     InputHandling(player);
     UpdateMovement(player);
+    UpdatePlayerState(player);
 
     GreenCollision(player, map);
     RedCollision(player, map);
