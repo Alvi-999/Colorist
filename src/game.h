@@ -4,6 +4,7 @@
 #include "player.h"
 #include "map.h"
 #include "collision.h"
+#include "combat.h"
 
 void UpdateGame(Player *player, Map *map)
 {
