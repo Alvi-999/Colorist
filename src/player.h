@@ -78,9 +78,15 @@ void InputHandling(Player *player)
 {
     player->velocity.x = 0;
 
+    if(player->state == ATTACK)
+    {
+        return;
+    }
+
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
         StartAttack(player);
+        return;
     }
 
     if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
@@ -118,85 +124,79 @@ void InputHandling(Player *player)
     }
 }
 
-void UpdatePlayerState(Player *player)
-{
-    //if jumping
-    int previous_state = player->state;
-    if(player->velocity.y < 0)
-    {
-        if(player->facingRight) player->state = JUMPR;
-        else player->state = JUMPL;
-    }
-
-    //falling
-    else if((player->velocity.y > 0) && (!player->grounded))
-    {
-        player->state = FALL;
-    }
-
-    //runnin
-    else if(player->velocity.x != 0)
-    {
-        if(player->facingRight) player->state = RUNR;
-        else player->state = RUNL;
-    }
-    
-    //idle
-    else 
-    {
-        if(player->facingRight) player->state = IDLER;
-        else player->state = IDLEL;
-    }
-
-    if (previous_state != player->state)
-    {
-        player->framecount = 0;
-    }
-}
-
 void DrawPlayer(Player *player)
 {
-    //player animation goes here
-    //for example, you can just run a switch here
-    //depending on the state of player 
-    //animation will run
-
+    // Player animation goes here
     player->framecount++;
-    player->framecount = (player->framecount)%60;
+    player->framecount = player->framecount % 60;
 
-    //(JUST PUT THE FUNCTION TO THE ANIMATIONS HERE)
     switch(player->state)
     {
         case IDLER:
-            //player->sprite = IdleRightAnimation(player);
+            // player->sprite = IdleRightAnimation(player);
             break;
 
         case IDLEL:
-            //player->sprite = IdleLeftAnimation(player);
+            // player->sprite = IdleLeftAnimation(player);
             break;
 
         case RUNR:
-            //player->sprite = RunRightAnimation(player);
+            // player->sprite = RunRightAnimation(player);
             break;
 
         case RUNL:
-            //player->sprite = RunLeftAnimation(player);
+            // player->sprite = RunLeftAnimation(player);
             break;
-        
+
         case JUMPL:
             break;
 
         case FALL:
             break;
-
     }
 
-    Rectangle source = {0, 0, (float)player->sprite.width, (float)player->sprite.height};
+    Rectangle source =
+    {
+        0,
+        0,
+        (float)player->sprite.width,
+        (float)player->sprite.height
+    };
 
-    Rectangle dest = {player->position.x, player->position.y, player->width, player->height};
+    Rectangle dest =
+    {
+        player->position.x,
+        player->position.y,
+        player->width,
+        player->height
+    };
 
-    DrawTexturePro(player->sprite, source, dest, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(
+        player->sprite,
+        source,
+        dest,
+        (Vector2){0, 0},
+        0.0f,
+        WHITE
+    );
+
+    // DEBUG
+    DrawText(
+        TextFormat("STATE: %d  TIMER: %d",
+                   player->state,
+                   player->attackTimer),
+        20,
+        20,
+        20,
+        WHITE
+    );
+
+    if(player->state == ATTACK && player->attackTimer >= ATTACK_STARTUP && player->attackTimer < ATTACK_STARTUP + ATTACK_ACTIVE)
+    {
+        DrawRectangleRec(player->attack, RED);
+    }
 }
+
 
 void UpdateMovement(Player *player)
 {
