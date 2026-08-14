@@ -4,7 +4,9 @@
 
 void StartAttack(Player *player)
 {
-    if(player->state == ATTACK || player->defending)
+    if(player->state == DEFEND ||
+       player->state == ATTACK ||
+       player->state == DEATH)
     {
         return;
     }
@@ -12,26 +14,28 @@ void StartAttack(Player *player)
     player->state = ATTACK;
     player->attackTimer = 0;
 
-    //put the attack hitbox in front of the player
     if(player->facingRight)
     {
         player->attack = (Rectangle)
         {
             player->body.x + player->body.width,
-            player->body.y + 15, 
-            40, 30
+            player->body.y + 15,
+            40,
+            30
         };
     }
-    else 
+    else
     {
         player->attack = (Rectangle)
         {
-            player->body.x - 40, 
-            player->body.y + 15, 
-            40, 30
+            player->body.x - 40,
+            player->body.y + 15,
+            40,
+            30
         };
     }
 }
+
 void UpdateAttack(Player *player)
 {
     if(player->state != ATTACK)
@@ -103,5 +107,7 @@ void TakeDamage(Player *player, int damage)
     {
         player->hits = 0;
         player->state = DEATH;
+
+        RespawnPlayer(player);
     }
 }

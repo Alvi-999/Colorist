@@ -8,6 +8,8 @@
 typedef struct Player
 {
     Vector2 position;
+    Vector2 spawnPosition;
+    
     Vector2 velocity;
     
     Texture2D sprite;
@@ -32,6 +34,8 @@ typedef struct Player
     int attackTimer;
     bool defending;
     
+
+    
 } Player;
 
 void StartAttack(Player *player);
@@ -49,7 +53,10 @@ Texture2D RunLeftAnimation(Player *player);
 
 void InitializePlayer(Player *player)
 {
-    player->position = (Vector2){100, 300};
+    
+    player->spawnPosition = (Vector2){100, 300};
+    player->position = player->spawnPosition;
+    
 
     player->velocity = (Vector2){0, 0};
 
@@ -73,6 +80,27 @@ void InitializePlayer(Player *player)
     player->hits = MAX_HITS;
 
     player->framecount=0;
+}
+
+void RespawnPlayer(Player *player)
+{
+    player->position = player->spawnPosition;
+
+    player->body.x = player->position.x;
+    player->body.y = player->position.y;
+
+    player->velocity = (Vector2){0, 0};
+
+    player->hits = MAX_HITS;
+
+    player->grounded = false;
+    player->doubleJumpAvailable = true;
+    player->inWater = false;
+
+    player->defending = false;
+    player->attackTimer = 0;
+
+    player->state = IDLER;
 }
 
 void InputHandling(Player *player)
