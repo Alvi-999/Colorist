@@ -36,6 +36,7 @@ typedef struct Player
 
 void StartAttack(Player *player);
 void StartDefence(Player *player);
+void TakeDamage(Player *player, int damage);
 
 
 
@@ -76,6 +77,11 @@ void InitializePlayer(Player *player)
 
 void InputHandling(Player *player)
 {
+    if(player->state == DEATH)
+    {
+        return;
+    }
+
     player->velocity.x = 0;
 
     if(player->state == ATTACK)
@@ -179,22 +185,6 @@ void DrawPlayer(Player *player)
         0.0f,
         WHITE
     );
-
-    // DEBUG
-    DrawText(
-        TextFormat("STATE: %d  TIMER: %d",
-                   player->state,
-                   player->attackTimer),
-        20,
-        20,
-        20,
-        WHITE
-    );
-
-    if(player->state == ATTACK && player->attackTimer >= ATTACK_STARTUP && player->attackTimer < ATTACK_STARTUP + ATTACK_ACTIVE)
-    {
-        DrawRectangleRec(player->attack, RED);
-    }
 }
 
 

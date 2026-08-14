@@ -90,4 +90,18 @@ void UpdateDefence(Player *player)
     }
 }
 
-void TakeDamage(Player *player, int damage);
+void TakeDamage(Player *player, int damage)
+{
+    if(player->defending)
+    {
+        return;
+    }
+
+    player->hits -= damage;
+
+    if(player->hits < 0)
+    {
+        player->hits = 0;
+        player->state = DEATH;
+    }
+}

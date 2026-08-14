@@ -24,6 +24,7 @@ const float JUMP_FORCE = -50.0f;
 #define ATTACK 7
 #define DASH 8
 #define DEFEND 9
+#define DEATH 10
 
 #define ATTACK_STARTUP 5
 #define ATTACK_ACTIVE 10
