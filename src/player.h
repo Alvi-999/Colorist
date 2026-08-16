@@ -42,16 +42,26 @@ Texture2D RunLeftAnimation(Player *player);
 
 void InitializePlayer(Player *player)
 {
-    player->position = (Vector2){100, 300};
+    player->position = (Vector2){546, 76};
 
     player->velocity = (Vector2){0, 0};
 
     player->width = 64;
     player->height = 64;
 
-    player->body = (Rectangle){player->position.x, player->position.y, player->width, player->height};
+    player->body = (Rectangle){
+        player->position.x,
+        player->position.y,
+        player->width,
+        player->height
+    };
 
-    player->attack = (Rectangle){player->position.x, player->position.y, 50, 30};
+    player->attack = (Rectangle){
+        player->position.x,
+        player->position.y,
+        50,
+        30
+    };
 
     player->sprite = LoadTexture("idler/idler-1.png");
 
@@ -65,8 +75,9 @@ void InitializePlayer(Player *player)
 
     player->hits = MAX_HITS;
 
-    player->framecount=0;
+    player->framecount = 0;
 }
+
 
 void InputHandling(Player *player)
 {
