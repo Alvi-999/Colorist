@@ -16,10 +16,7 @@ void UpdateGame(Player *player, Map *map)
     YellowCollision(player, map);
     BlueCollision(player, map);
 
-    UpdateYellowPlatforms(map);   // <-- here
-
-    DrawMap(map);
-    DrawPlayer(player);
+    UpdateYellowPlatforms(map);
 }
 
 void DrawGame(Player *player, Map *map)
