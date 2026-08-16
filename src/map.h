@@ -179,21 +179,138 @@ void UnloadMap(Map *map)
 
 void DrawMap(Map *map)
 {
-    for(int i = 0; i < 14; i++)
+    static bool texturesLoaded = false;
+
+    static Texture2D groundg1Tex, groundg2Tex, floatg1Tex, floatg2Tex, flatg1Tex;
+    static Texture2D floatr1Tex, groundr1Tex, flatr1Tex, floatr2Tex;
+    static Texture2D floatb1Tex, floatb2Tex, flatb1Tex;
+    static Texture2D groundy2Tex, floaty1Tex, floaty2Tex, flaty1Tex;
+
+    if (!texturesLoaded)
     {
-        DrawRectangleRec(map->green[i].body, GREEN);
+        groundg1Tex = LoadTexture("assets/groundg1.png");
+        groundg2Tex = LoadTexture("assets/groundg2.png");
+        floatg1Tex  = LoadTexture("assets/floatg1.png");
+        floatg2Tex  = LoadTexture("assets/floatg2.png");
+        flatg1Tex   = LoadTexture("assets/flatg1.png");
+
+        floatr1Tex  = LoadTexture("assets/floatr1.png");
+        groundr1Tex = LoadTexture("assets/groundr1.png");
+        flatr1Tex   = LoadTexture("assets/flatr1.png");
+        floatr2Tex  = LoadTexture("assets/floatr2.png");
+
+        floatb1Tex = LoadTexture("assets/floatb1.png");
+        floatb2Tex = LoadTexture("assets/floatb2.png");
+        flatb1Tex  = LoadTexture("assets/flatb1.png");
+
+        groundy2Tex = LoadTexture("assets/groundy2.png");
+        floaty1Tex  = LoadTexture("assets/floaty1.png");
+        floaty2Tex  = LoadTexture("assets/floaty2.png");
+        flaty1Tex   = LoadTexture("assets/flaty1.png");
+
+        texturesLoaded = true;
     }
-    for(int i = 0; i < 17; i++)
+
+    // -------------------- Green ----------------------
+    for (int i = 0; i <= 1; i++)
     {
-        DrawRectangleRec(map->red[i].body, RED);
+        Rectangle source = {0, 0, (float)groundg1Tex.width, (float)groundg1Tex.height};
+        DrawTexturePro(groundg1Tex, source, map->green[i].body, (Vector2){0, 0}, 0.0f, WHITE);
     }
-    for(int i = 0; i < 11; i++)
+
     {
-        DrawRectangleRec(map->blue[i].body, BLUE);
+        Rectangle source = {0, 0, (float)groundg2Tex.width, (float)groundg2Tex.height};
+        DrawTexturePro(groundg2Tex, source, map->green[2].body, (Vector2){0, 0}, 0.0f, WHITE);
     }
-    for(int i = 0; i < 17; i++)
+
     {
-        DrawRectangleRec(map->yellow[i].body, YELLOW);
+        Rectangle source = {0, 0, (float)floatg1Tex.width, (float)floatg1Tex.height};
+        DrawTexturePro(floatg1Tex, source, map->green[3].body, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    for (int i = 4; i <= 6; i++)
+    {
+        Rectangle source = {0, 0, (float)floatg2Tex.width, (float)floatg2Tex.height};
+        DrawTexturePro(floatg2Tex, source, map->green[i].body, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    for (int i = 7; i <= 13; i++)
+    {
+        Rectangle source = {0, 0, (float)flatg1Tex.width, (float)flatg1Tex.height};
+        DrawTexturePro(flatg1Tex, source, map->green[i].body, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    // -------------------------- Red -----------------------------
+    for (int i = 0; i <= 2; i++)
+    {
+        Rectangle source = {0, 0, (float)floatr1Tex.width, (float)floatr1Tex.height};
+        DrawTexturePro(floatr1Tex, source, map->red[i].body, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    for (int i = 3; i <= 4; i++)
+    {
+        Rectangle source = {0, 0, (float)groundr1Tex.width, (float)groundr1Tex.height};
+        DrawTexturePro(groundr1Tex, source, map->red[i].body, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    for (int i = 5; i <= 13; i++)
+    {
+        Rectangle source = {0, 0, (float)flatr1Tex.width, (float)flatr1Tex.height};
+        DrawTexturePro(flatr1Tex, source, map->red[i].body, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    for (int i = 14; i <= 16; i++)
+    {
+        Rectangle source = {0, 0, (float)floatr2Tex.width, (float)floatr2Tex.height};
+        DrawTexturePro(floatr2Tex, source, map->red[i].body, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    // --------------------------------- Blue ---------------------------------------
+    for (int i = 0; i <= 4; i++)
+    {
+        Rectangle source = {0, 0, (float)floatb1Tex.width, (float)floatb1Tex.height};
+        DrawTexturePro(floatb1Tex, source, map->blue[i].body, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    {
+        Rectangle source = {0, 0, (float)floatb2Tex.width, (float)floatb2Tex.height};
+        DrawTexturePro(floatb2Tex, source, map->blue[5].body, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    for (int i = 6; i <= 10; i++)
+    {
+        Rectangle source = {0, 0, (float)flatb1Tex.width, (float)flatb1Tex.height};
+        DrawTexturePro(flatb1Tex, source, map->blue[i].body, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    // -------------------------------- Yellow ----------------------------------------
+    if (!map->yellow[0].broken)
+    {
+        Rectangle source = {0, 0, (float)groundy2Tex.width, (float)groundy2Tex.height};
+        DrawTexturePro(groundy2Tex, source, map->yellow[0].body, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    for (int i = 1; i <= 3; i++)
+    {
+        if (!map->yellow[i].broken)
+        {
+            Rectangle source = {0, 0, (float)floaty1Tex.width, (float)floaty1Tex.height};
+            DrawTexturePro(floaty1Tex, source, map->yellow[i].body, (Vector2){0, 0}, 0.0f, WHITE);
+        }
+    }
+
+    if (!map->yellow[4].broken)
+    {
+        Rectangle source = {0, 0, (float)floaty2Tex.width, (float)floaty2Tex.height};
+        DrawTexturePro(floaty2Tex, source, map->yellow[4].body, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    for (int i = 5; i <= 16; i++)
+    {
+        if (!map->yellow[i].broken)
+        {
+            Rectangle source = {0, 0, (float)flaty1Tex.width, (float)flaty1Tex.height};
+            DrawTexturePro(flaty1Tex, source, map->yellow[i].body, (Vector2){0, 0}, 0.0f, WHITE);
+        }
     }
 }
-
