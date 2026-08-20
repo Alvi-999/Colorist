@@ -14,16 +14,14 @@ void UpdateGame(Player *player, Map *map)
     UpdateDefence(player);
 
     UpdateMovement(player);
+    UpdatePlayerState(player);
 
     GreenCollision(player, map);
     RedCollision(player, map);
     YellowCollision(player, map);
     BlueCollision(player, map);
 
-    UpdateYellowPlatforms(map);   // <-- here
-
-    DrawMap(map);
-    DrawPlayer(player);
+    UpdateYellowPlatforms(map);
 }
 
 void DrawGame(Player *player, Map *map)
