@@ -8,31 +8,42 @@
 typedef struct Player
 {
     Vector2 position;
-
+    Vector2 spawnPosition;
+    
     Vector2 velocity;
-
+    
     Texture2D sprite;
-
+    
     Rectangle body;
     Rectangle attack;
-
+    
     float width;
     float height;
-
+    
     bool facingRight;
-
     bool grounded;
-
     bool doubleJumpAvailable;
-
-    int state;
-
-    int hits;
-
-    int framecount;
-
     bool inWater;
+    
+    int state;
+    
+    int hits;
+    int framecount;
+    
+    // Combat
+    int attackTimer;
+    bool defending;
+    
+
+    
 } Player;
+
+void StartAttack(Player *player);
+void StartDefence(Player *player);
+void TakeDamage(Player *player, int damage);
+
+
+
 
 //animation functions
 Texture2D IdleRightAnimation(Player *player);
@@ -43,7 +54,8 @@ Texture2D RunLeftAnimation(Player *player);
 void InitializePlayer(Player *player)
 {
     player->position = (Vector2){546, 76};
-
+    player->position = player->spawnPosition;
+    
     player->velocity = (Vector2){0, 0};
 
     player->width = 64;
@@ -78,10 +90,52 @@ void InitializePlayer(Player *player)
     player->framecount = 0;
 }
 
+void RespawnPlayer(Player *player)
+{
+    player->position = player->spawnPosition;
+
+    player->body.x = player->position.x;
+    player->body.y = player->position.y;
+
+    player->velocity = (Vector2){0, 0};
+
+    player->hits = MAX_HITS;
+
+    player->grounded = false;
+    player->doubleJumpAvailable = true;
+    player->inWater = false;
+
+    player->defending = false;
+    player->attackTimer = 0;
+
+    player->state = IDLER;
+}
 
 void InputHandling(Player *player)
 {
+    if(player->state == DEATH)
+    {
+        return;
+    }
+
     player->velocity.x = 0;
+
+    if(player->state == ATTACK)
+    {
+        return;
+    }
+
+    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        StartAttack(player);
+        return;
+    }
+
+    if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+    {
+        StartDefence(player);
+        return;
+    }
 
     if(IsKeyDown(KEY_D))
     {
@@ -112,53 +166,12 @@ void InputHandling(Player *player)
     }
 }
 
-void UpdatePlayerState(Player *player)
-{
-    //if jumping
-    int previous_state = player->state;
-    if(player->velocity.y < 0)
-    {
-        if(player->facingRight) player->state = JUMPR;
-        else player->state = JUMPL;
-    }
-
-    //falling
-    else if((player->velocity.y > 0) && (!player->grounded))
-    {
-        player->state = FALL;
-    }
-
-    //runnin
-    else if(player->velocity.x != 0)
-    {
-        if(player->facingRight) player->state = RUNR;
-        else player->state = RUNL;
-    }
-    
-    //idle
-    else 
-    {
-        if(player->facingRight) player->state = IDLER;
-        else player->state = IDLEL;
-    }
-
-    if (previous_state != player->state)
-    {
-        player->framecount = 0;
-    }
-}
-
 void DrawPlayer(Player *player)
 {
-    //player animation goes here
-    //for example, you can just run a switch here
-    //depending on the state of player 
-    //animation will run
-
+    // Player animation goes here
     player->framecount++;
-    player->framecount = (player->framecount)%60;
+    player->framecount = player->framecount % 60;
 
-    //(JUST PUT THE FUNCTION TO THE ANIMATIONS HERE)
     switch(player->state)
     {
         case 0: //idlel
@@ -189,12 +202,32 @@ void DrawPlayer(Player *player)
 
     }
 
-    Rectangle source = {0, 0, (float)player->sprite.width, (float)player->sprite.height};
+    Rectangle source =
+    {
+        0,
+        0,
+        (float)player->sprite.width,
+        (float)player->sprite.height
+    };
 
-    Rectangle dest = {player->position.x, player->position.y, player->width, player->height};
+    Rectangle dest =
+    {
+        player->position.x,
+        player->position.y,
+        player->width,
+        player->height
+    };
 
-    DrawTexturePro(player->sprite, source, dest, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(
+        player->sprite,
+        source,
+        dest,
+        (Vector2){0, 0},
+        0.0f,
+        WHITE
+    );
 }
+
 
 void UpdateMovement(Player *player)
 {
@@ -208,7 +241,6 @@ void UpdateMovement(Player *player)
     player->position.y += player->velocity.y;
     player->body.y = player->position.y;
 }
-
 
 
 // --------------Animation------------------------------
