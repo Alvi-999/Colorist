@@ -14,14 +14,22 @@ const float MOVE_SPEED = 3.0f;
 const float JUMP_FORCE = -50.0f;
 
 // Player states
-const int IDLEL = 0;
-const int IDLER = 1;
-const int RUNL = 2;
-const int RUNR = 3;
-const int JUMPL = 4;
-const int JUMPR = 5;
-const int FALL = 6;
-const int ATTACK = 7;
-const int DASH = 8;
+#define IDLEL 0
+#define IDLER 1
+#define RUNL 2
+#define RUNR 3
+#define JUMPL 4
+#define JUMPR 5
+#define FALL 6
+#define ATTACK 7
+#define DASH 8
+#define DEFEND 9
+#define DEATH 10
+
+#define ATTACK_STARTUP 5
+#define ATTACK_ACTIVE 10
+#define ATTACK_RECOVERY 15
+
+#define ATTACK_DAMAGE 1
 
 const int MAX_HITS = 5;
