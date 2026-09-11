@@ -3,7 +3,7 @@
 #include <raylib.h>
 #include <stdio.h>
 #include "constants.h"
-
+#include "grappling.h"
 
 typedef struct Player
 {
@@ -33,6 +33,8 @@ typedef struct Player
     // Combat
     int attackTimer;
     bool defending;
+
+    GrapplingHook hook;
 } Player;
 
 #include "animation.h"
@@ -65,6 +67,13 @@ void InitializePlayer(Player *player)
 
     player->width = 64;
     player->height = 64;
+
+    player->hook.position = player->position;
+    player->hook.direction = (Vector2){0.0f, 0.0f};
+    player->hook.attachPoint = (Vector2){0.0f, 0.0f};
+    player->hook.distanceTravelled = 0.0f;
+    player->hook.attached = false;
+    player->hook.state = HOOK_IDLE;
 
     player->body = (Rectangle){
         player->position.x,
