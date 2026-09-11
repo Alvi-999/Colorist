@@ -3,7 +3,10 @@
 #include <raylib.h>
 #include <stdio.h>
 #include "constants.h"
-
+#include "grappling.h"
+#include "map.h"
+#include <math.h>
+#include <float.h>
 
 typedef struct Player
 {
@@ -33,6 +36,8 @@ typedef struct Player
     // Combat
     int attackTimer;
     bool defending;
+
+    GrapplingHook hook;
 } Player;
 
 #include "animation.h"
@@ -41,18 +46,15 @@ void StartAttack(Player *player);
 void StartDefence(Player *player);
 void TakeDamage(Player *player, int damage);
 void InitializePlayer(Player *player);
-void InputHandling(Player *player);
+void InputHandling(Player *player, Map *map);
 void UpdatePlayerState(Player *player);
 void UpdateMovement(Player *player);
 void DrawPlayer(Player *player);
-
-
-
-//animation functions
-Texture2D IdleRightAnimation(Player *player);
-Texture2D IdleLeftAnimation(Player *player);
-Texture2D RunRightAnimation(Player *player);
-Texture2D RunLeftAnimation(Player *player);
+void UpdateGrappling(Player *player, Map *map);
+bool GrappleHitsValidObject(Vector2 startPosition, Vector2 endPosition, Map *map, Vector2 *hitPosition);
+void resetGrappling(Player *player);
+void DrawGrappling(Player *player);
+bool CheckGrappleRectangle(Vector2 startPosition, Vector2 endPosition, Rectangle object, Vector2 *hitPosition);
 
 void InitializePlayer(Player *player)
 {
@@ -65,6 +67,13 @@ void InitializePlayer(Player *player)
 
     player->width = 64;
     player->height = 64;
+
+    player->hook.position = player->position;
+    player->hook.direction = (Vector2){0.0f, 0.0f};
+    player->hook.attachPoint = (Vector2){0.0f, 0.0f};
+    player->hook.distanceTravelled = 0.0f;
+    player->hook.attached = false;
+    player->hook.state = HOOK_IDLE;
 
     player->body = (Rectangle){
         player->position.x,
@@ -91,6 +100,36 @@ void InitializePlayer(Player *player)
     player->framecount = 0;
 }
 
+
+bool CheckGrappleRectangle(Vector2 startPosition, Vector2 endPosition, Rectangle object, Vector2 *hitPosition)
+{
+    if(startPosition.y < object.y || startPosition.y > object.y + object.height)
+    {
+        return false;
+    }
+
+    float left = fminf(startPosition.x, endPosition.x);
+    float right = fmaxf(startPosition.x, endPosition.x);
+
+    if(right < object.x || left > object.x + object.width)
+    {
+        return false;
+    }
+
+    if(endPosition.x > startPosition.x)
+    {
+        hitPosition->x = object.x;
+    }
+    else 
+    {
+        hitPosition->x = object.x + object.width;
+    }
+
+    hitPosition->y = startPosition.y;
+
+    return true;
+}
+
 void RespawnPlayer(Player *player)
 {
     player->position = player->spawnPosition;
@@ -112,8 +151,215 @@ void RespawnPlayer(Player *player)
     player->state = IDLER;
 }
 
-void InputHandling(Player *player)
+void resetGrappling(Player *player)
 {
+    player->hook.state = HOOK_IDLE;
+    player->hook.distanceTravelled = 0.0f;
+    player->hook.attached = false;
+    player->hook.direction = (Vector2){0.0f, 0.0f};
+}
+
+
+bool GrappleHitsValidObject(Vector2 startPosition, Vector2 endPosition, Map *map, Vector2 *hitPosition)
+{
+    float nearestDistance = FLT_MAX;
+    bool foundObject = false;
+
+    float left = fminf(startPosition.x, endPosition.x);
+    float right = fmaxf(startPosition.x, endPosition.x);
+
+    for(int i = 0; i < map->greenCount; i++)
+    {
+        Rectangle object = map->green[i].body;
+
+        if(startPosition.y >= object.y && startPosition.y <= object.y + object.height && right >= object.x && left <= object.x + object.width)
+        {
+            float contactX;
+
+            if(endPosition.x > startPosition.x)
+            {
+                contactX = object.x;
+            }
+            else contactX = object.x + object.width;
+
+            float distance = fabsf(contactX - startPosition.x);
+
+            if(distance < nearestDistance)
+            {
+                nearestDistance = distance;
+
+                hitPosition->x = contactX;
+                hitPosition->y = startPosition.y;
+
+                foundObject = true;
+            }
+        }
+    }
+
+    for(int i = 0; i < map->redCount; i++)
+    {
+        Rectangle object = map->red[i].body;
+
+        if(startPosition.y >= object.y &&
+           startPosition.y <= object.y + object.height &&
+           right >= object.x &&
+           left <= object.x + object.width)
+        {
+            float contactX;
+
+            if(endPosition.x > startPosition.x)
+                contactX = object.x;
+            else
+                contactX = object.x + object.width;
+
+            float distance = fabsf(contactX - startPosition.x);
+
+            if(distance < nearestDistance)
+            {
+                nearestDistance = distance;
+
+                hitPosition->x = contactX;
+                hitPosition->y = startPosition.y;
+
+                foundObject = true;
+            }
+        }
+    }
+
+    for(int i = 0; i < map->blueCount; i++)
+    {
+        Rectangle object = map->blue[i].body;
+
+        if(startPosition.y >= object.y &&
+           startPosition.y <= object.y + object.height &&
+           right >= object.x &&
+           left <= object.x + object.width)
+        {
+            float contactX;
+
+            if(endPosition.x > startPosition.x)
+                contactX = object.x;
+            else
+                contactX = object.x + object.width;
+
+            float distance = fabsf(contactX - startPosition.x);
+
+            if(distance < nearestDistance)
+            {
+                nearestDistance = distance;
+
+                hitPosition->x = contactX;
+                hitPosition->y = startPosition.y;
+
+                foundObject = true;
+            }
+        }
+    }
+
+    for(int i = 0; i < map->yellowCount; i++)
+    {
+        Rectangle object = map->yellow[i].body;
+
+        if(startPosition.y >= object.y &&
+           startPosition.y <= object.y + object.height &&
+           right >= object.x &&
+           left <= object.x + object.width)
+        {
+            float contactX;
+
+            if(endPosition.x > startPosition.x)
+                contactX = object.x;
+            else
+                contactX = object.x + object.width;
+
+            float distance = fabsf(contactX - startPosition.x);
+
+            if(distance < nearestDistance)
+            {
+                nearestDistance = distance;
+
+                hitPosition->x = contactX;
+                hitPosition->y = startPosition.y;
+
+                foundObject = true;
+            }
+        }
+    }
+
+    return foundObject;
+}
+
+
+void UpdateGrappling(Player *player, Map *map)
+{
+    if(player->hook.state == HOOK_IDLE)
+    {
+        if(IsKeyPressed(KEY_Q))
+        {
+            player->hook.state = HOOK_PULLING;
+
+            player->hook.position = player->position;
+
+            player->hook.distanceTravelled = 0.0f;
+            player->hook.attached = false;
+
+            if(player->facingRight)
+            {
+                player->hook.direction = (Vector2){1.0f, 0.0f};
+            }
+            else
+            {
+                player->hook.direction = (Vector2){-1.0f, 0.0f};
+            }
+        }
+    }
+
+    if(player->hook.state == HOOK_PULLING)
+    {
+        float movement = player->hook.direction.x * HOOK_SPEED;
+
+        Vector2 startPosition = player->hook.position;
+
+        Vector2 nextPosition = startPosition;
+        nextPosition.x += movement;
+
+        Vector2 hitPosition;
+
+        player->hook.distanceTravelled += HOOK_SPEED;
+
+        if(GrappleHitsValidObject(startPosition, nextPosition, map, &hitPosition))
+        {
+            player->hook.position = hitPosition;
+            player->hook.attachPoint = hitPosition;
+            player->hook.attached = true;
+
+            player->position.x = hitPosition.x;
+
+            player->body.x = player->position.x;
+            player->body.y = player->position.y;
+            player->hook.state = HOOK_RETRACTING;
+
+            return;
+        }
+
+        player->hook.position = nextPosition;
+
+        if(player->hook.distanceTravelled >= HOOK_MAX_DISTANCE)
+        {
+            player->hook.state = HOOK_RETRACTING;
+        }
+    }
+
+    if(player->hook.state == HOOK_RETRACTING)
+    {
+        resetGrappling(player);
+    }
+}
+
+void InputHandling(Player *player, Map *map)
+{
+    UpdateGrappling(player, map);
+
     if(player->state == DEATH)
     {
         return;
@@ -229,9 +475,24 @@ void DrawPlayer(Player *player)
     );
 }
 
+void DrawGrappling(Player *player)
+{
+    if(player->hook.state == HOOK_PULLING || player->hook.attached)
+    {
+        DrawLineEx(player->position, player->hook.position, 4.0f, WHITE);
+
+        DrawCircleV(player->hook.position, 6.0f, RED);
+    }
+}
+
 
 void UpdateMovement(Player *player)
 {
+    if(player->hook.state == HOOK_PULLING)
+    {
+        return;
+    }
+
     //gravity
     player->velocity.y += GRAVITY;
 

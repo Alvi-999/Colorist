@@ -9,9 +9,9 @@ const int COLLISION_RIGHT = 4;
 const int YELLOW_BREAK_TIME = 37;
 
 // Physics constants
-const float GRAVITY = 5.00f;
-const float MOVE_SPEED = 3.0f;
-const float JUMP_FORCE = -50.0f;
+const float GRAVITY = 1.00f;
+const float MOVE_SPEED = 5.0f;
+const float JUMP_FORCE = -15.0f;
 
 // Player states
 #define IDLEL 0
@@ -30,10 +30,10 @@ const float JUMP_FORCE = -50.0f;
 #define ATTACK_ACTIVE 10
 #define ATTACK_RECOVERY 15
 
-#define HOOK_IDLE 16; 
-#define HOOK_SHOOTING 17;
-#define HOOK_PULLING 18;
-#define HOOK RETRACTING 19;
+#define HOOK_IDLE 16
+#define HOOK_SHOOTING 17
+#define HOOK_PULLING 18
+#define HOOK_RETRACTING 19
 
 const float HOOK_SPEED = 15.0f;
 const float HOOK_PULL_SPEED = 10.0f;
