@@ -33,10 +33,9 @@ typedef struct Player
     // Combat
     int attackTimer;
     bool defending;
-    
-
-    
 } Player;
+
+#include "animation.h"
 
 void StartAttack(Player *player);
 void StartDefence(Player *player);
@@ -272,37 +271,4 @@ void UpdatePlayerState(Player *player)
     {
         player->framecount = 0;
     }
-}
-
-// --------------Animation------------------------------
-Texture2D RunRightAnimation(Player *player)
-{
-    char CurrentAnimationString[30];
-    snprintf(CurrentAnimationString, sizeof(CurrentAnimationString), "runr/runr-%d.png", player->framecount/5 + 1);
-    Texture2D CurrentAnimationFrame = LoadTexture(CurrentAnimationString);
-    return CurrentAnimationFrame;
-}
-
-Texture2D RunLeftAnimation(Player *player)
-{
-    char CurrentAnimationString[30];
-    snprintf(CurrentAnimationString, sizeof(CurrentAnimationString), "runl/runl-%d.png", player->framecount/5 + 1);
-    Texture2D CurrentAnimationFrame = LoadTexture(CurrentAnimationString);
-    return CurrentAnimationFrame;
-}
-
-Texture2D IdleRightAnimation(Player *player)
-{
-    char CurrentAnimationString[30];
-    snprintf(CurrentAnimationString, sizeof(CurrentAnimationString), "idler/idler-%d.png", player->framecount/5 + 1);
-    Texture2D CurrentAnimationFrame = LoadTexture(CurrentAnimationString);
-    return CurrentAnimationFrame;
-}
-
-Texture2D IdleLeftAnimation(Player *player)
-{
-    char CurrentAnimationString[30];
-    snprintf(CurrentAnimationString, sizeof(CurrentAnimationString), "idlel/idlel-%d.png", player->framecount/5 + 1);
-    Texture2D CurrentAnimationFrame = LoadTexture(CurrentAnimationString);
-    return CurrentAnimationFrame;
 }
