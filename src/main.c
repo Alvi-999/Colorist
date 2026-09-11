@@ -22,7 +22,7 @@ int main()
 
         BeginDrawing();
 
-        ClearBackground(BLACK);
+        ClearBackground(WHITE);
 
         DrawGame(&player, &map);
 

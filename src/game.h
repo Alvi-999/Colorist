@@ -10,7 +10,7 @@
 
 void UpdateGame(Player *player, Map *map)
 {
-    InputHandling(player);
+    InputHandling(player, map);
     
     UpdateAttack(player);
     UpdateDefence(player);

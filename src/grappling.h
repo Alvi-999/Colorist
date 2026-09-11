@@ -15,4 +15,3 @@ typedef struct GrapplingHook
     
     int state;
 } GrapplingHook;
-
