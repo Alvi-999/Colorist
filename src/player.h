@@ -41,7 +41,11 @@ typedef struct Player
 void StartAttack(Player *player);
 void StartDefence(Player *player);
 void TakeDamage(Player *player, int damage);
-
+void InitializePlayer(Player *player);
+void InputHandling(Player *player);
+void UpdatePlayerState(Player *player);
+void UpdateMovement(Player *player);
+void DrawPlayer(Player *player);
 
 
 
@@ -54,6 +58,8 @@ Texture2D RunLeftAnimation(Player *player);
 void InitializePlayer(Player *player)
 {
     player->position = (Vector2){546, 76};
+    player->spawnPosition = (Vector2){546, 76};
+
     player->position = player->spawnPosition;
     
     player->velocity = (Vector2){0, 0};
@@ -78,15 +84,11 @@ void InitializePlayer(Player *player)
     player->sprite = LoadTexture("idler/idler-1.png");
 
     player->facingRight = true;
-
     player->grounded = false;
-
     player->doubleJumpAvailable = true;
 
     player->state = IDLER;
-
     player->hits = MAX_HITS;
-
     player->framecount = 0;
 }
 
@@ -242,6 +244,35 @@ void UpdateMovement(Player *player)
     player->body.y = player->position.y;
 }
 
+void UpdatePlayerState(Player *player)
+{
+    int previous_state = player->state;
+
+    if(player->velocity.y < 0)
+    {
+        if(player->facingRight) player->state = JUMPR;
+        else player->state = JUMPL;
+    }
+    else if((player->velocity.y > 0) && (!player->grounded))
+    {
+        player->state = FALL;
+    }
+    else if(player->velocity.x != 0)
+    {
+        if(player->facingRight) player->state = RUNR;
+        else player->state = RUNL;
+    }
+    else 
+    {
+        if(player->facingRight) player->state = IDLER;
+        else player->state = IDLEL;
+    }
+
+    if(previous_state != player->state)
+    {
+        player->framecount = 0;
+    }
+}
 
 // --------------Animation------------------------------
 Texture2D RunRightAnimation(Player *player)
