@@ -13,6 +13,8 @@ const float GRAVITY = 1.00f;
 const float MOVE_SPEED = 5.0f;
 const float JUMP_FORCE = -15.0f;
 
+int Menu_State;
+
 // Player states
 #define IDLEL 0
 #define IDLER 1
