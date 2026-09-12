@@ -2,6 +2,7 @@
 #include "constants.h"
 
 int Menu_State;
+int Menu_Framecount = 0;
 
 Texture2D blank_menu;
 
@@ -9,6 +10,8 @@ Texture2D play_game, play_game_inv;
 Texture2D continue_game, continue_game_inv;
 Texture2D rules, rules_inv;
 Texture2D quit, quit_inv;
+
+Texture2D menu_sprite[12];
 
 bool play_game_inverted = false;
 bool continue_game_inverted = false;
@@ -45,10 +48,19 @@ void InitializeMenu()
 
     quit     = LoadTexture("main_menu/quit.png");
     quit_inv = LoadTexture("main_menu/quit_inv.png");
+
+    for (int i=0; i<12; i++)
+    {
+        char animation_frame[30];
+        snprintf(animation_frame, sizeof(animation_frame), "main_menu/animatics-%d.png", i+1);
+        menu_sprite[i] = LoadTexture(animation_frame);
+    }
 }
 
 void UpdateMenu()
 {
+    Menu_Framecount=(Menu_Framecount+1)%60;
+
     play_game_inverted = false;
     continue_game_inverted = false;
     rules_inverted = false;
@@ -119,6 +131,13 @@ void DrawMenu()
         quit_inverted ? quit_inv : quit,
         (Rectangle) { 0.0f, 0.0f, (float)quit.width, (float)quit.height },
         (Rectangle) { 1550.0f, 465.0f, 300.0f, 160.0f },
+        (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE
+    );
+
+    DrawTexturePro(
+        menu_sprite[(Menu_Framecount/5)],
+        (Rectangle) { 0.0f, 0.0f, (float)menu_sprite[Menu_Framecount%12].width, (float)menu_sprite[Menu_Framecount%12].height },
+        (Rectangle) { 0.0f, 0.0f, 1920.0f, 1080.0f},
         (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE
     );
 }
