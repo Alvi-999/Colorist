@@ -3,33 +3,72 @@
 #include "player.h"
 #include "game.h"
 #include "map.h"
+#include "camera.h"
+#include "menu.h"
 
 int main()
 {
-    InitWindow(1280, 720, "Colorist");
+    InitWindow(1920, 1080, "Colorist");
     SetTargetFPS(60);
+
+    InitializeMenu();
 
     Player player;
     Map map;
+    Camera2D MainCamera;
     
-    InitializePlayer(player);
+    InitializePlayer(&player);
 
-    LoadMap(map);
+    LoadMap(&map);
+
+    InitializeCamera(&MainCamera, &player);
 
     while(!WindowShouldClose())
     {
-        UpdateGame(player, map);
 
-        BeginDrawing();
+        if (Menu_State == MENU_MAIN)
+        {
+            UpdateMenu();
 
-        ClearBackground(BLACK);
+            if (Menu_State != MENU_MAIN)
+            {
+                continue;
+            }
 
-        DrawGame(player, map);
+            BeginDrawing();
+                DrawMenu();
+            EndDrawing();
+        }
+        else if (Menu_State == MENU_RULEBOOK) //Since ekhono rulebook design hoynai, oke main menu tei rakhbo
+        {
+            BeginDrawing();
+                DrawMenu();
+            EndDrawing();
+        }
+        else if (Menu_State == MENU_GAME)
+        {
+            UpdateGame(&player, &map);
 
-        EndDrawing();
+            UpdateMainCamera(&MainCamera, &player);
+
+            BeginDrawing();
+
+            ClearBackground(BLACK);
+
+            BeginMode2D(MainCamera);
+                DrawGame(&player, &map);
+            EndMode2D();
+
+            EndDrawing();
+        }
+        else if (Menu_State == MENU_QUIT)
+        {
+            UnloadAllMenuTexture();
+            break;
+        }
     }
 
-    UnloadMap(map);
+    UnloadMap(&map);
     UnloadTexture(player.sprite);
 
     CloseWindow();

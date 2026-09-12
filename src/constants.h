@@ -1,27 +1,50 @@
 #pragma once
 
-constexpr int COLLISION_NONE = 0;
-constexpr int COLLISION_TOP = 1;
-constexpr int COLLISION_BOTTOM = 2;
-constexpr int COLLISION_LEFT = 3;
-constexpr int COLLISION_RIGHT = 4;
+const int COLLISION_NONE = 0;
+const int COLLISION_TOP = 1;
+const int COLLISION_BOTTOM = 2;
+const int COLLISION_LEFT = 3;
+const int COLLISION_RIGHT = 4;
 
-constexpr int YELLOW_BREAK_TIME = 37;
+const int YELLOW_BREAK_TIME = 37;
 
 // Physics constants
-constexpr float GRAVITY = 5.00f;
-constexpr float MOVE_SPEED = 5.0f;
-constexpr float JUMP_FORCE = -25.0f;
+const float GRAVITY = 1.00f;
+const float MOVE_SPEED = 5.0f;
+const float JUMP_FORCE = -15.0f;
 
 // Player states
-constexpr int IDLEL = 0;
-constexpr int IDLER = 1;
-constexpr int RUNL = 2;
-constexpr int RUNR = 3;
-constexpr int JUMPL = 4;
-constexpr int JUMPR = 5;
-constexpr int FALL = 6;
-constexpr int ATTACK = 7;
-constexpr int DASH = 8;
+#define IDLEL 0
+#define IDLER 1
+#define RUNL 2
+#define RUNR 3
+#define JUMPL 4
+#define JUMPR 5
+#define FALL 6
+#define ATTACK 7
+#define DASH 8
+#define DEFEND 9
+#define DEATH 10
 
-constexpr int MAX_HITS = 5;
+#define ATTACK_STARTUP 5
+#define ATTACK_ACTIVE 10
+#define ATTACK_RECOVERY 15
+
+#define HOOK_IDLE 16
+#define HOOK_SHOOTING 17
+#define HOOK_PULLING 18
+#define HOOK_RETRACTING 19
+
+const float HOOK_SPEED = 15.0f;
+const float HOOK_PULL_SPEED = 10.0f;
+const float HOOK_MAX_DISTANCE = 450.0f;
+
+#define ATTACK_DAMAGE 1
+
+const int MAX_HITS = 5;
+
+// Menu state
+#define MENU_MAIN 1
+#define MENU_RULEBOOK 2
+#define MENU_GAME 3
+#define MENU_QUIT 4

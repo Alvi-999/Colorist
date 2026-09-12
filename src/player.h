@@ -3,452 +3,533 @@
 #include <raylib.h>
 #include <stdio.h>
 #include "constants.h"
+#include "grappling.h"
+#include "map.h"
+#include <math.h>
+#include <float.h>
 
-
-struct Player
+typedef struct Player
 {
     Vector2 position;
-
+    Vector2 spawnPosition;
+    
     Vector2 velocity;
-
+    
     Texture2D sprite;
-
+    
     Rectangle body;
     Rectangle attack;
-
+    
     float width;
     float height;
-
+    
     bool facingRight;
-
     bool grounded;
-
     bool doubleJumpAvailable;
-
-    int state;
-
-    int hits;
-
-    int framecount;
-
     bool inWater;
-};
+    
+    int state;
+    
+    int hits;
+    int framecount;
+    
+    // Combat
+    int attackTimer;
+    bool defending;
 
-//animation functions
-Texture2D IdleRightAnimation(Player &player);
-Texture2D IdleLeftAnimation(Player &player);
-Texture2D RunRightAnimation(Player &player);
-Texture2D RunLeftAnimation(Player &player);
+    GrapplingHook hook;
+} Player;
 
-void InitializePlayer(Player &player)
+#include "animation.h"
+
+void StartAttack(Player *player);
+void StartDefence(Player *player);
+void TakeDamage(Player *player, int damage);
+void InitializePlayer(Player *player);
+void InputHandling(Player *player, Map *map);
+void UpdatePlayerState(Player *player);
+void UpdateMovement(Player *player);
+void DrawPlayer(Player *player);
+void UpdateGrappling(Player *player, Map *map);
+bool GrappleHitsValidObject(Vector2 startPosition, Vector2 endPosition, Map *map, Vector2 *hitPosition);
+void resetGrappling(Player *player);
+void DrawGrappling(Player *player);
+bool CheckGrappleRectangle(Vector2 startPosition, Vector2 endPosition, Rectangle object, Vector2 *hitPosition);
+
+void InitializePlayer(Player *player)
 {
-    player.position = {100, 300};
+    player->position = (Vector2){546, 76};
+    player->spawnPosition = (Vector2){546, 76};
 
-    player.velocity = {0, 0};
+    player->position = player->spawnPosition;
+    
+    player->velocity = (Vector2){0, 0};
 
-    player.width = 64;
-    player.height = 64;
+    player->width = 64;
+    player->height = 64;
 
-    player.body = {player.position.x, player.position.y, player.width, player.height};
+    player->hook.position = player->position;
+    player->hook.direction = (Vector2){0.0f, 0.0f};
+    player->hook.attachPoint = (Vector2){0.0f, 0.0f};
+    player->hook.distanceTravelled = 0.0f;
+    player->hook.attached = false;
+    player->hook.state = HOOK_IDLE;
 
-    player.attack = {player.position.x, player.position.y, 50, 30};
+    player->body = (Rectangle){
+        player->position.x,
+        player->position.y,
+        player->width,
+        player->height
+    };
 
-    player.sprite = LoadTexture("assets/decoration/idle_right1.png");
+    player->attack = (Rectangle){
+        player->position.x,
+        player->position.y,
+        50,
+        30
+    };
 
-    player.facingRight = true;
+    player->sprite = LoadTexture("idler/idler-1.png");
 
-    player.grounded = false;
+    player->facingRight = true;
+    player->grounded = false;
+    player->doubleJumpAvailable = true;
 
-    player.doubleJumpAvailable = true;
-
-    player.state = IDLER;
-
-    player.hits = MAX_HITS;
-
-    player.framecount=0;
+    player->state = IDLER;
+    player->hits = MAX_HITS;
+    player->framecount = 0;
 }
 
-void InputHandling(Player &player)
+
+bool CheckGrappleRectangle(Vector2 startPosition, Vector2 endPosition, Rectangle object, Vector2 *hitPosition)
 {
-    player.velocity.x = 0;
+    if(startPosition.y < object.y || startPosition.y > object.y + object.height)
+    {
+        return false;
+    }
+
+    float left = fminf(startPosition.x, endPosition.x);
+    float right = fmaxf(startPosition.x, endPosition.x);
+
+    if(right < object.x || left > object.x + object.width)
+    {
+        return false;
+    }
+
+    if(endPosition.x > startPosition.x)
+    {
+        hitPosition->x = object.x;
+    }
+    else 
+    {
+        hitPosition->x = object.x + object.width;
+    }
+
+    hitPosition->y = startPosition.y;
+
+    return true;
+}
+
+void RespawnPlayer(Player *player)
+{
+    player->position = player->spawnPosition;
+
+    player->body.x = player->position.x;
+    player->body.y = player->position.y;
+
+    player->velocity = (Vector2){0, 0};
+
+    player->hits = MAX_HITS;
+
+    player->grounded = false;
+    player->doubleJumpAvailable = true;
+    player->inWater = false;
+
+    player->defending = false;
+    player->attackTimer = 0;
+
+    player->state = IDLER;
+}
+
+void resetGrappling(Player *player)
+{
+    player->hook.state = HOOK_IDLE;
+    player->hook.distanceTravelled = 0.0f;
+    player->hook.attached = false;
+    player->hook.direction = (Vector2){0.0f, 0.0f};
+}
+
+
+bool GrappleHitsValidObject(Vector2 startPosition, Vector2 endPosition, Map *map, Vector2 *hitPosition)
+{
+    float nearestDistance = FLT_MAX;
+    bool foundObject = false;
+
+    float left = fminf(startPosition.x, endPosition.x);
+    float right = fmaxf(startPosition.x, endPosition.x);
+
+    for(int i = 0; i < map->greenCount; i++)
+    {
+        Rectangle object = map->green[i].body;
+
+        if(startPosition.y >= object.y && startPosition.y <= object.y + object.height && right >= object.x && left <= object.x + object.width)
+        {
+            float contactX;
+
+            if(endPosition.x > startPosition.x)
+            {
+                contactX = object.x;
+            }
+            else contactX = object.x + object.width;
+
+            float distance = fabsf(contactX - startPosition.x);
+
+            if(distance < nearestDistance)
+            {
+                nearestDistance = distance;
+
+                hitPosition->x = contactX;
+                hitPosition->y = startPosition.y;
+
+                foundObject = true;
+            }
+        }
+    }
+
+    for(int i = 0; i < map->redCount; i++)
+    {
+        Rectangle object = map->red[i].body;
+
+        if(startPosition.y >= object.y &&
+           startPosition.y <= object.y + object.height &&
+           right >= object.x &&
+           left <= object.x + object.width)
+        {
+            float contactX;
+
+            if(endPosition.x > startPosition.x)
+                contactX = object.x;
+            else
+                contactX = object.x + object.width;
+
+            float distance = fabsf(contactX - startPosition.x);
+
+            if(distance < nearestDistance)
+            {
+                nearestDistance = distance;
+
+                hitPosition->x = contactX;
+                hitPosition->y = startPosition.y;
+
+                foundObject = true;
+            }
+        }
+    }
+
+    for(int i = 0; i < map->blueCount; i++)
+    {
+        Rectangle object = map->blue[i].body;
+
+        if(startPosition.y >= object.y &&
+           startPosition.y <= object.y + object.height &&
+           right >= object.x &&
+           left <= object.x + object.width)
+        {
+            float contactX;
+
+            if(endPosition.x > startPosition.x)
+                contactX = object.x;
+            else
+                contactX = object.x + object.width;
+
+            float distance = fabsf(contactX - startPosition.x);
+
+            if(distance < nearestDistance)
+            {
+                nearestDistance = distance;
+
+                hitPosition->x = contactX;
+                hitPosition->y = startPosition.y;
+
+                foundObject = true;
+            }
+        }
+    }
+
+    for(int i = 0; i < map->yellowCount; i++)
+    {
+        Rectangle object = map->yellow[i].body;
+
+        if(startPosition.y >= object.y &&
+           startPosition.y <= object.y + object.height &&
+           right >= object.x &&
+           left <= object.x + object.width)
+        {
+            float contactX;
+
+            if(endPosition.x > startPosition.x)
+                contactX = object.x;
+            else
+                contactX = object.x + object.width;
+
+            float distance = fabsf(contactX - startPosition.x);
+
+            if(distance < nearestDistance)
+            {
+                nearestDistance = distance;
+
+                hitPosition->x = contactX;
+                hitPosition->y = startPosition.y;
+
+                foundObject = true;
+            }
+        }
+    }
+
+    return foundObject;
+}
+
+
+void UpdateGrappling(Player *player, Map *map)
+{
+    if(player->hook.state == HOOK_IDLE)
+    {
+        if(IsKeyPressed(KEY_Q))
+        {
+            player->hook.state = HOOK_PULLING;
+
+            player->hook.position = player->position;
+
+            player->hook.distanceTravelled = 0.0f;
+            player->hook.attached = false;
+
+            if(player->facingRight)
+            {
+                player->hook.direction = (Vector2){1.0f, 0.0f};
+            }
+            else
+            {
+                player->hook.direction = (Vector2){-1.0f, 0.0f};
+            }
+        }
+    }
+
+    if(player->hook.state == HOOK_PULLING)
+    {
+        float movement = player->hook.direction.x * HOOK_SPEED;
+
+        Vector2 startPosition = player->hook.position;
+
+        Vector2 nextPosition = startPosition;
+        nextPosition.x += movement;
+
+        Vector2 hitPosition;
+
+        player->hook.distanceTravelled += HOOK_SPEED;
+
+        if(GrappleHitsValidObject(startPosition, nextPosition, map, &hitPosition))
+        {
+            player->hook.position = hitPosition;
+            player->hook.attachPoint = hitPosition;
+            player->hook.attached = true;
+
+            player->position.x = hitPosition.x;
+
+            player->body.x = player->position.x;
+            player->body.y = player->position.y;
+            player->hook.state = HOOK_RETRACTING;
+
+            return;
+        }
+
+        player->hook.position = nextPosition;
+
+        if(player->hook.distanceTravelled >= HOOK_MAX_DISTANCE)
+        {
+            player->hook.state = HOOK_RETRACTING;
+        }
+    }
+
+    if(player->hook.state == HOOK_RETRACTING)
+    {
+        resetGrappling(player);
+    }
+}
+
+void InputHandling(Player *player, Map *map)
+{
+    UpdateGrappling(player, map);
+
+    if(player->state == DEATH)
+    {
+        return;
+    }
+
+    player->velocity.x = 0;
+
+    if(player->state == ATTACK)
+    {
+        return;
+    }
+
+    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        StartAttack(player);
+        return;
+    }
+
+    if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+    {
+        StartDefence(player);
+        return;
+    }
 
     if(IsKeyDown(KEY_D))
     {
-        player.velocity.x = MOVE_SPEED;
-        player.facingRight = true;
+        player->velocity.x = MOVE_SPEED;
+        player->facingRight = true;
     }
 
     if(IsKeyDown(KEY_A))
     {
-        player.velocity.x = -MOVE_SPEED;    
-        player.facingRight = false;
+        player->velocity.x = -MOVE_SPEED;    
+        player->facingRight = false;
     }
 
     //first jump
-    if(IsKeyPressed(KEY_W) and player.grounded and !player.inWater)
+    if(IsKeyPressed(KEY_W) && player->grounded && (!player->inWater))
     {
-        player.velocity.y = JUMP_FORCE;
+        player->velocity.y = JUMP_FORCE;
 
-        player.grounded = false;
+        player->grounded = false;
     }
     
     //the second jump
-    else if(IsKeyPressed(KEY_W) and !player.grounded and player.doubleJumpAvailable and !player.inWater)
+    else if(IsKeyPressed(KEY_W) && (!player->grounded) && player->doubleJumpAvailable && (!player->inWater))
     {
-        player.doubleJumpAvailable = false;
+        player->doubleJumpAvailable = false;
 
-        player.velocity.y = JUMP_FORCE;
+        player->velocity.y = JUMP_FORCE;
     }
 }
 
-void UpdatePlayerState(Player &player)
+void DrawPlayer(Player *player)
 {
-    //if jumping
-    int previous_state = player.state;
-    if(player.velocity.y < 0)
-    {
-        if(player.facingRight) player.state = JUMPR;
-        else player.state = JUMPL;
-    }
+    // Player animation goes here
+    player->framecount++;
+    player->framecount = player->framecount % 60;
 
-    //falling
-    else if((player.velocity.y > 0) and !player.grounded)
+    switch(player->state)
     {
-        player.state = FALL;
-    }
-
-    //runnin
-    else if(player.velocity.x != 0)
-    {
-        if(player.facingRight) player.state = RUNR;
-        else player.state = RUNL;
-    }
-    
-    //idle
-    else 
-    {
-        if(player.facingRight) player.state = IDLER;
-        else player.state = IDLEL;
-    }
-
-    if (previous_state != player.state)
-    {
-        player.framecount = 0;
-    }
-}
-
-void DrawPlayer(Player &player)
-{
-    //player animation goes here
-    //for example, you can just run a switch here
-    //depending on the state of player 
-    //animation will run
-
-    player.framecount++;
-    player.framecount = (player.framecount)%60;
-
-    //(JUST PUT THE FUNCTION TO THE ANIMATIONS HERE)
-    switch(player.state)
-    {
-        case IDLER:
-            player.sprite = IdleRightAnimation(player);
+        case 0: //idlel
+            UnloadTexture(player->sprite);
+            player->sprite = IdleLeftAnimation(player);
             break;
 
-        case IDLEL:
-            player.sprite = IdleLeftAnimation(player);
+        case 1: //idler
+            UnloadTexture(player->sprite);
+            player->sprite = IdleRightAnimation(player);
             break;
 
-        case RUNR:
-            player.sprite = RunRightAnimation(player);
+        case 2: //runl
+            UnloadTexture(player->sprite);
+            player->sprite = RunLeftAnimation(player);
             break;
 
-        case RUNL:
-            player.sprite = RunLeftAnimation(player);
+        case 3: //runr
+            UnloadTexture(player->sprite);
+            player->sprite = RunRightAnimation(player);
             break;
         
-        case JUMPL:
+        case 4: //jump
             break;
 
-        case FALL:
+        case 5: //fall
             break;
 
     }
 
-    Rectangle source = {0, 0, (float)player.sprite.width, (float)player.sprite.height};
+    Rectangle source =
+    {
+        0,
+        0,
+        (float)player->sprite.width,
+        (float)player->sprite.height
+    };
 
-    Rectangle dest = {player.position.x, player.position.y, player.width, player.height};
+    Rectangle dest =
+    {
+        player->position.x,
+        player->position.y,
+        player->width,
+        player->height
+    };
 
-    DrawTexturePro(player.sprite, source, dest, {0, 0}, 0.0f, WHITE);
+    DrawTexturePro(
+        player->sprite,
+        source,
+        dest,
+        (Vector2){0, 0},
+        0.0f,
+        WHITE
+    );
 }
 
-void UpdateMovement(Player &player)
+void DrawGrappling(Player *player)
 {
+    if(player->hook.state == HOOK_PULLING || player->hook.attached)
+    {
+        DrawLineEx(player->position, player->hook.position, 4.0f, WHITE);
+
+        DrawCircleV(player->hook.position, 6.0f, RED);
+    }
+}
+
+
+void UpdateMovement(Player *player)
+{
+    if(player->hook.state == HOOK_PULLING)
+    {
+        return;
+    }
+
     //gravity
-    player.velocity.y += GRAVITY;
+    player->velocity.y += GRAVITY;
 
     //MOVE PLAYER
-    player.position.x += player.velocity.x;
-    player.body.x = player.position.x;
+    player->position.x += player->velocity.x;
+    player->body.x = player->position.x;
 
-    player.position.y += player.velocity.y;
-    player.body.y = player.position.y;
+    player->position.y += player->velocity.y;
+    player->body.y = player->position.y;
 }
 
-
-
-// --------------Animation------------------------------
-Texture2D IdleRightAnimation(Player &player)
+void UpdatePlayerState(Player *player)
 {
-    if(player.framecount>=0 && player.framecount<5)
-    {
-        Texture2D SpriteImage = LoadTexture("idler/idler-1.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=5 && player.framecount<10)
-    {
-        Texture2D SpriteImage = LoadTexture("idler/idler-2.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=10 && player.framecount<15)
-    {
-        Texture2D SpriteImage = LoadTexture("idler/idler-3.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=15 && player.framecount<20)
-    {
-        Texture2D SpriteImage = LoadTexture("idler/idler-4.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=20 && player.framecount<25)
-    {
-        Texture2D SpriteImage = LoadTexture("idler/idler-5.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=25 && player.framecount<30)
-    {
-        Texture2D SpriteImage = LoadTexture("idler/idler-6.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=30 && player.framecount<35)
-    {
-        Texture2D SpriteImage = LoadTexture("idler/idler-7.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=35 && player.framecount<40)
-    {
-        Texture2D SpriteImage = LoadTexture("idler/idler-8.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=40 && player.framecount<45)
-    {
-        Texture2D SpriteImage = LoadTexture("idler/idler-9.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=45 && player.framecount<50)
-    {
-        Texture2D SpriteImage = LoadTexture("idler/idler-10.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=50 && player.framecount<55)
-    {
-        Texture2D SpriteImage = LoadTexture("idler/idler-11.png");
-        return SpriteImage;
-    }
-    else
-    {
-        Texture2D SpriteImage = LoadTexture("idler/idler-12.png");
-        return SpriteImage;
-    }
-}
+    int previous_state = player->state;
 
-Texture2D IdleLeftAnimation(Player &player)
-{
-    if(player.framecount>=0 && player.framecount<5)
+    if(player->velocity.y < 0)
     {
-        Texture2D SpriteImage = LoadTexture("idlel/idlel-1.png");
-        return SpriteImage;
+        if(player->facingRight) player->state = JUMPR;
+        else player->state = JUMPL;
     }
-    else if(player.framecount>=5 && player.framecount<10)
+    else if((player->velocity.y > 0) && (!player->grounded))
     {
-        Texture2D SpriteImage = LoadTexture("idlel/idlel-2.png");
-        return SpriteImage;
+        player->state = FALL;
     }
-    else if(player.framecount>=10 && player.framecount<15)
+    else if(player->velocity.x != 0)
     {
-        Texture2D SpriteImage = LoadTexture("idlel/idlel-3.png");
-        return SpriteImage;
+        if(player->facingRight) player->state = RUNR;
+        else player->state = RUNL;
     }
-    else if(player.framecount>=15 && player.framecount<20)
+    else 
     {
-        Texture2D SpriteImage = LoadTexture("idlel/idlel-4.png");
-        return SpriteImage;
+        if(player->facingRight) player->state = IDLER;
+        else player->state = IDLEL;
     }
-    else if(player.framecount>=20 && player.framecount<25)
-    {
-        Texture2D SpriteImage = LoadTexture("idlel/idlel-5.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=25 && player.framecount<30)
-    {
-        Texture2D SpriteImage = LoadTexture("idlel/idlel-6.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=30 && player.framecount<35)
-    {
-        Texture2D SpriteImage = LoadTexture("idlel/idlel-7.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=35 && player.framecount<40)
-    {
-        Texture2D SpriteImage = LoadTexture("idlel/idlel-8.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=40 && player.framecount<45)
-    {
-        Texture2D SpriteImage = LoadTexture("idlel/idlel-9.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=45 && player.framecount<50)
-    {
-        Texture2D SpriteImage = LoadTexture("idlel/idlel-10.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=50 && player.framecount<55)
-    {
-        Texture2D SpriteImage = LoadTexture("idlel/idlel-11.png");
-        return SpriteImage;
-    }
-    else
-    {
-        Texture2D SpriteImage = LoadTexture("idlel/idlel-12.png");
-        return SpriteImage;
-    }
-}
 
-Texture2D RunRightAnimation(Player &player)
-{
-    if(player.framecount>=0 && player.framecount<5)
+    if(previous_state != player->state)
     {
-        Texture2D SpriteImage = LoadTexture("runr/runr-1.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=5 && player.framecount<10)
-    {
-        Texture2D SpriteImage = LoadTexture("runr/runr-2.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=10 && player.framecount<15)
-    {
-        Texture2D SpriteImage = LoadTexture("runr/runr-3.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=15 && player.framecount<20)
-    {
-        Texture2D SpriteImage = LoadTexture("runr/runr-4.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=20 && player.framecount<25)
-    {
-        Texture2D SpriteImage = LoadTexture("runr/runr-5.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=25 && player.framecount<30)
-    {
-        Texture2D SpriteImage = LoadTexture("runr/runr-6.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=30 && player.framecount<35)
-    {
-        Texture2D SpriteImage = LoadTexture("runr/runr-7.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=35 && player.framecount<40)
-    {
-        Texture2D SpriteImage = LoadTexture("runr/runr-8.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=40 && player.framecount<45)
-    {
-        Texture2D SpriteImage = LoadTexture("runr/runr-9.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=45 && player.framecount<50)
-    {
-        Texture2D SpriteImage = LoadTexture("runr/runr-10.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=50 && player.framecount<55)
-    {
-        Texture2D SpriteImage = LoadTexture("runr/runr-11.png");
-        return SpriteImage;
-    }
-    else
-    {
-        Texture2D SpriteImage = LoadTexture("runr/runr-12.png");
-        return SpriteImage;
-    }
-}
-
-Texture2D RunLeftAnimation(Player &player)
-{
-    if(player.framecount>=0 && player.framecount<5)
-    {
-        Texture2D SpriteImage = LoadTexture("runl/runl-1.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=5 && player.framecount<10)
-    {
-        Texture2D SpriteImage = LoadTexture("runl/runl-2.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=10 && player.framecount<15)
-    {
-        Texture2D SpriteImage = LoadTexture("runl/runl-3.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=15 && player.framecount<20)
-    {
-        Texture2D SpriteImage = LoadTexture("runl/runl-4.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=20 && player.framecount<25)
-    {
-        Texture2D SpriteImage = LoadTexture("runl/runl-5.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=25 && player.framecount<30)
-    {
-        Texture2D SpriteImage = LoadTexture("runl/runl-6.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=30 && player.framecount<35)
-    {
-        Texture2D SpriteImage = LoadTexture("runl/runl-7.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=35 && player.framecount<40)
-    {
-        Texture2D SpriteImage = LoadTexture("runl/runl-8.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=40 && player.framecount<45)
-    {
-        Texture2D SpriteImage = LoadTexture("runl/runl-9.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=45 && player.framecount<50)
-    {
-        Texture2D SpriteImage = LoadTexture("runl/runl-10.png");
-        return SpriteImage;
-    }
-    else if(player.framecount>=50 && player.framecount<55)
-    {
-        Texture2D SpriteImage = LoadTexture("runl/runl-11.png");
-        return SpriteImage;
-    }
-    else
-    {
-        Texture2D SpriteImage = LoadTexture("runl/runl-12.png");
-        return SpriteImage;
+        player->framecount = 0;
     }
 }
