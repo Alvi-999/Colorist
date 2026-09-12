@@ -1,0 +1,16 @@
+﻿In the ‘main_menu’ folder, there are individual pieces for play_game, continue, rules, and quit.
+
+
+‘main_reference.png’ is an image that gives you the idea of how the menu would look.
+
+
+‘menu+buttons.png’ is there because I thought it would help make things a little bit easier.
+
+
+I am thinking of making the menu button color inverted so that you can place the individual buttons on top of it to hide it but whenever the player hovers over the individual buttons, it will show the color below…
+
+
+And upon clicking you can use all the functions that the buttons do; or see the button texture baked onto the ‘menu+buttons.png’.
+
+
+There is a blank menu also upon which you can include the animatics sprites and button pngs as you wish. The animatics are there to place the animation of the character in the main menu.
