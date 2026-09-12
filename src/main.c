@@ -5,6 +5,7 @@
 #include "map.h"
 #include "camera.h"
 #include "menu.h"
+#include "enemy.h"
 
 int main()
 {
@@ -25,6 +26,10 @@ int main()
 
     while(!WindowShouldClose())
     {
+        if(IsKeyPressed(KEY_F11))
+        {
+            ToggleFullscreen();
+        }
 
         if (Menu_State == MENU_MAIN)
         {

@@ -65,8 +65,8 @@ void InitializePlayer(Player *player)
     
     player->velocity = (Vector2){0, 0};
 
-    player->width = 64;
-    player->height = 64;
+    player->width = 96;
+    player->height = 96;
 
     player->hook.position = player->position;
     player->hook.direction = (Vector2){0.0f, 0.0f};
