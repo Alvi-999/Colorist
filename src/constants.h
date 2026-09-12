@@ -42,3 +42,9 @@ const float HOOK_MAX_DISTANCE = 450.0f;
 #define ATTACK_DAMAGE 1
 
 const int MAX_HITS = 5;
+
+// Menu state
+#define MENU_MAIN 1
+#define MENU_RULEBOOK 2
+#define MENU_GAME 3
+#define MENU_QUIT 4
