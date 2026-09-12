@@ -30,6 +30,11 @@ int main()
         {
             UpdateMenu();
 
+            if (Menu_State != MENU_MAIN)
+            {
+                continue;
+            }
+
             BeginDrawing();
                 DrawMenu();
             EndDrawing();
@@ -40,7 +45,7 @@ int main()
                 DrawMenu();
             EndDrawing();
         }
-        else 
+        else if (Menu_State == MENU_GAME)
         {
             UpdateGame(&player, &map);
 
@@ -55,6 +60,11 @@ int main()
             EndMode2D();
 
             EndDrawing();
+        }
+        else if (Menu_State == MENU_QUIT)
+        {
+            UnloadAllMenuTexture();
+            break;
         }
     }
 
