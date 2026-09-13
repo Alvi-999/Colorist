@@ -34,8 +34,37 @@ typedef struct Boss
     int hurtTimer;
 
     int framecount;
+    
     Texture2D sprite;
+    Texture2D healthIcon;
 } Boss;
+
+void DrawBossHealthUI(const Boss *boss)
+{
+    int startX = 20;
+    int startY = 20;
+
+    int iconSize = 32;
+    int gap = 6;
+
+    for(int i = 0; i < boss->health; i++)
+    {
+        int iconX = startX + (i * (iconSize + gap));
+
+        DrawTexturePro
+        (
+            boss->healthIcon, 
+
+            (Rectangle){0, 0, (float)boss->healthIcon.width, (float)boss->healthIcon.height}, 
+            
+            (Rectangle){iconX, startY, iconSize, iconSize},
+            
+            (Vector2){0, 0}, 
+            0.0f,
+            WHITE
+        );
+    }
+}
 
 void InitializeBoss(Boss *boss, Vector2 spawnPosition)
 {
@@ -52,8 +81,7 @@ void InitializeBoss(Boss *boss, Vector2 spawnPosition)
     boss->attack = (Rectangle){0, 0, 0, 0};
 
     boss->maxHealth = BOSS_MAX_HEALTH_BARS * BOSS_HITS_PER_BAR;
-
-    boss->health = boss->maxHealth;
+    boss->health = BOSS_MAX_HEALTH_BARS;
 
     boss->facingRight = false;
     
@@ -145,12 +173,14 @@ void BossTakeDamage(Boss *boss, int damage)
    } 
 
    boss->health -= damage;
-
-   if(boss->health <= 0)
-   {
+   
+   boss->health = (boss->maxHealth + BOSS_HITS_PER_BAR - 1) / BOSS_HITS_PER_BAR;
+   
+    if(boss->health <= 0)
+    {
         boss->health = 0;
         boss->state = BOSS_DEATH;
-   }   
+    }
 }
 
 void UpdateBossBlock(Boss *boss, Player *player)
