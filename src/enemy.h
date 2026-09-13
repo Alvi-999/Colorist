@@ -39,32 +39,32 @@ typedef struct Boss
     Texture2D healthIcon;
 } Boss;
 
-void DrawBossHealthUI(const Boss *boss)
-{
-    int startX = 20;
-    int startY = 20;
+// void DrawBossHealthUI(const Boss *boss)
+// {
+//     int startX = 20;
+//     int startY = 20;
 
-    int iconSize = 32;
-    int gap = 6;
+//     int iconSize = 32;
+//     int gap = 6;
 
-    for(int i = 0; i < boss->health; i++)
-    {
-        int iconX = startX + (i * (iconSize + gap));
+//     for(int i = 0; i < boss->health; i++)
+//     {
+//         int iconX = startX + (i * (iconSize + gap));
 
-        DrawTexturePro
-        (
-            boss->healthIcon, 
+//         DrawTexturePro
+//         (
+//             boss->healthIcon, 
 
-            (Rectangle){0, 0, (float)boss->healthIcon.width, (float)boss->healthIcon.height}, 
+//             (Rectangle){0, 0, (float)boss->healthIcon.width, (float)boss->healthIcon.height}, 
             
-            (Rectangle){iconX, startY, iconSize, iconSize},
+//             (Rectangle){iconX, startY, iconSize, iconSize},
             
-            (Vector2){0, 0}, 
-            0.0f,
-            WHITE
-        );
-    }
-}
+//             (Vector2){0, 0}, 
+//             0.0f,
+//             WHITE
+//         );
+//     }
+// }
 
 void InitializeBoss(Boss *boss, Vector2 spawnPosition)
 {

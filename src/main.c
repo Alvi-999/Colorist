@@ -17,7 +17,6 @@ int main()
     Player player;
     Map map;
     Camera2D MainCamera;
-    Boss boss;
 
     InitializePlayer(&player);
 

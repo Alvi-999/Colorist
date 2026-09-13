@@ -36,7 +36,7 @@ typedef struct Map
 {
     Texture2D background;
 
-    Green green[14];
+    Green green[15];
 
     Red red[17];
 
@@ -78,6 +78,7 @@ void LoadMap(Map *map)
     map->green[11].body = (Rectangle) {3956, 945, 243, 58};
     map->green[12].body = (Rectangle) {4239, 1647, 202, 54};
     map->green[13].body = (Rectangle) {4707, 860, 230, 63};
+    map->green[14].body = (Rectangle) {10000, 10000, 3840, 300};
 
     //-------------------- Red platform ------------------------
     //floatr1
@@ -160,7 +161,7 @@ void LoadMap(Map *map)
         map->yellow[i].breakTimer = 0;
     }
 
-    map->greenCount = 14;
+    map->greenCount = 15;
     map->redCount = 17;
     map->blueCount = 11;
     map->yellowCount = 17; 
@@ -239,6 +240,9 @@ void DrawMap(Map *map)
         Rectangle source = {0, 0, (float)flatg1Tex.width, (float)flatg1Tex.height};
         DrawTexturePro(flatg1Tex, source, map->green[i].body, (Vector2){0, 0}, 0.0f, WHITE);
     }
+
+    DrawRectangleRec(map->green[14].body, DARKGRAY);
+
 
     // -------------------------- Red -----------------------------
     for (int i = 0; i <= 2; i++)
