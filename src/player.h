@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "grappling.h"
 #include "map.h"
+#include "boss.h"
 #include <math.h>
 #include <float.h>
 
@@ -46,7 +47,7 @@ void StartAttack(Player *player);
 void StartDefence(Player *player);
 void TakeDamage(Player *player, int damage);
 void InitializePlayer(Player *player);
-void InputHandling(Player *player, Map *map);
+void InputHandling(Player *player, Map *map, Boss *boss);
 void UpdatePlayerState(Player *player);
 void UpdateMovement(Player *player);
 void DrawPlayer(Player *player);
@@ -356,7 +357,7 @@ void UpdateGrappling(Player *player, Map *map)
     }
 }
 
-void InputHandling(Player *player, Map *map)
+void InputHandling(Player *player, Map *map, Boss *boss)
 {
     if (IsKeyPressed(KEY_F1))
     {
@@ -384,6 +385,11 @@ void InputHandling(Player *player, Map *map)
     }
 
     player->velocity.x = 0;
+
+    if(IsKeyPressed(KEY_B))
+    {
+        BossStartAttack(boss);
+    }
 
     if(player->state == ATTACK)
     {

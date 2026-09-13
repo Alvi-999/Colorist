@@ -11,6 +11,7 @@ typedef struct Boss
     float height;
 
     Rectangle body;
+    Rectangle attack;
 
     int healthIcons;
     int maxHealthIcons;
@@ -21,17 +22,23 @@ typedef struct Boss
     bool active;
     bool defeated;
 
-    bool wasHit;
+    bool attacking;
+    bool attackHitPlayer;
 } Boss;
 
 void InitialBoss(Boss *boss)
 {
-    boss->position = (Vector2){10800.0f, 1390.0f};
+    boss->position = (Vector2){11000.0f, 1300.0f};
 
     boss->width = 256.0f;
     boss->height = 256.0f;
 
     boss->body = (Rectangle){boss->position.x, boss->position.y, boss->width, boss->height};
+
+    boss->attack = (Rectangle){boss->position.x - 80, boss->position.y + 30, 80, 100};
+
+    boss->attacking = false;
+    boss->attackHitPlayer = false;
 
     boss->maxHealthIcons = 10;
     boss->healthIcons = 10;
@@ -41,7 +48,19 @@ void InitialBoss(Boss *boss)
 
     boss->active = true;
     boss->defeated = false;
-    boss->wasHit = false;
+}
+
+void BossStartAttack(Boss *boss)
+{
+    if(!boss->active || boss->defeated)
+    {
+        return;
+    }
+
+    boss->attacking = true;
+    boss->attackHitPlayer = false;
+
+    boss->attack = (Rectangle){(boss->position.x - 80), (boss->position.y + 30), 80, 100};
 }
 
 void BossReceiveHit(Boss *boss)
@@ -73,6 +92,15 @@ void BossReceiveHit(Boss *boss)
     }
 }
 
+void DrawBoss(Boss *boss)
+{
+    if(!boss->active || boss->defeated) return;
+
+    DrawRectangle((int)boss->position.x, (int)boss->position.y, (int)boss->width, (int)boss->height, PURPLE);
+
+    DrawRectangleLines((int)boss->position.x, (int)boss->position.y, (int)boss->width, (int)boss->height, WHITE);
+}
+
 void DrawBossHealth(Boss *boss)
 {
     if(!boss->active && !boss->defeated)
@@ -101,5 +129,25 @@ void DrawBossHealth(Boss *boss)
         DrawRectangle((startX + i * (iconWidth + spacing)), startY, iconWidth, iconHeight, iconColor);
 
         DrawRectangleLines((startX + i *(iconWidth + spacing)), startY, iconWidth, iconHeight, WHITE);
+    }
+}
+
+void UpdateBoss(Boss *boss, Player *player)
+{
+    if(!boss->active || boss->defeated)
+    {
+        return;
+    }
+
+    if(boss->attacking)
+    {
+        if(!boss->attackHitPlayer && CheckCollisionCircleRecs(boss->attack, player->body))
+        {
+            TakeDamage(player, 1);
+
+            boss->attackHitPlayer = true;
+
+            TraceLog(LOG_INFO, "Player hit by boss!");
+        }
     }
 }

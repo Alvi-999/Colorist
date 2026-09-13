@@ -18,7 +18,10 @@ void UpdateMainCamera(Camera2D *MainCamera, Player *player)
     float screenWidth = (float)GetScreenWidth();
     float screenHeight = (float)GetScreenHeight();
 
-    MainCamera->target = player->position;
+    MainCamera->target = (Vector2){
+        player->position.x,
+        player->position.y
+    };
 
     MainCamera->offset = (Vector2){
         screenWidth / 2.0f,

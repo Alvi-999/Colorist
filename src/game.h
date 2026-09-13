@@ -6,11 +6,11 @@
 #include "collision.h"
 #include "combat.h"
 #include "constants.h"
-#include "enemy.h"
+#include "boss.h"
 
-void UpdateGame(Player *player, Map *map)
+void UpdateGame(Player *player, Map *map, Boss *boss)
 {
-    InputHandling(player, map);
+    InputHandling(player, map, boss);
     
     UpdateAttack(player);
     UpdateDefence(player);
@@ -26,9 +26,10 @@ void UpdateGame(Player *player, Map *map)
     UpdateYellowPlatforms(map);
 }
 
-void DrawGame(Player *player, Map *map)
+void DrawGame(Player *player, Map *map, Boss *boss)
 {
     DrawMap(map);
 
     DrawPlayer(player);
+    DrawBoss(boss);
 }

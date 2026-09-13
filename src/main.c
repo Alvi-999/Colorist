@@ -6,7 +6,7 @@
 #include "camera.h"
 #include "menu.h"
 #include "intro.h"
-#include "enemy.h"
+#include "boss.h"
 
 int main()
 {
@@ -20,7 +20,9 @@ int main()
     Player player;
     Map map;
     Camera2D MainCamera;
+    Boss boss;
 
+    InitialBoss(&boss);
     InitializePlayer(&player);
 
     LoadMap(&map);
@@ -55,7 +57,7 @@ int main()
         }
         else if (Menu_State == MENU_GAME)
         {
-            UpdateGame(&player, &map);
+            UpdateGame(&player, &map, &boss);
 
             UpdateMainCamera(&MainCamera, &player);
 
@@ -65,7 +67,7 @@ int main()
 
             BeginMode2D(MainCamera);
 
-            DrawGame(&player, &map);
+            DrawGame(&player, &map, &boss);
 
             EndMode2D();
 
@@ -79,6 +81,7 @@ int main()
                 YELLOW
             );
 
+            DrawBossHealth(&boss);
             EndDrawing();
         }
         else if (Menu_State == MENU_QUIT)
