@@ -163,3 +163,25 @@ void UpdateBossMovement(Boss *boss, Player *player)
     boss->body.x = boss->position.x;
     boss->body.y = boss->position.y;
 }
+
+void UpdateBossBlock(Boss *boss, Player *player)
+{
+    if(boss->state == BOSS_DEATH || boss->state == BOSS_STUNNED)
+    {
+        return;
+    }
+
+    float distanceX = player->position.x - boss->position.x;
+    float absoluteDistanceX = fabsf(distanceX);
+
+    if(player->state == ATTACK && absoluteDistanceX <= BOSS_STOP_DISTANCE)
+    {
+        boss->state = BOSS_BLOCK;
+        return;
+    }
+
+    if(boss->state == BOSS_BLOCK)
+    {
+        boss->state = BOSS_IDLE;
+    }
+}
