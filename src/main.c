@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "menu.h"
 #include "intro.h"
+#include "enemy.h"
 
 int main()
 {
@@ -19,7 +20,7 @@ int main()
     Player player;
     Map map;
     Camera2D MainCamera;
-    
+
     InitializePlayer(&player);
 
     LoadMap(&map);
@@ -28,6 +29,10 @@ int main()
 
     while(!WindowShouldClose())
     {
+        if(IsKeyPressed(KEY_F11))
+        {
+            ToggleFullscreen();
+        }
 
         if (Menu_State == MENU_MAIN)
         {
@@ -39,13 +44,13 @@ int main()
             }
 
             BeginDrawing();
-                DrawMenu();
+            DrawMenu();
             EndDrawing();
         }
         else if (Menu_State == MENU_RULEBOOK) //Since ekhono rulebook design hoynai, oke main menu tei rakhbo
         {
             BeginDrawing();
-                DrawMenu();
+            DrawMenu();
             EndDrawing();
         }
         else if (Menu_State == MENU_GAME)
@@ -59,8 +64,20 @@ int main()
             ClearBackground(BLACK);
 
             BeginMode2D(MainCamera);
-                DrawGame(&player, &map);
+
+            DrawGame(&player, &map);
+
             EndMode2D();
+
+            DrawText(
+                TextFormat("PLAYER X: %.0f  Y: %.0f",
+                        player.position.x,
+                        player.position.y),
+                20,
+                20,
+                24,
+                YELLOW
+            );
 
             EndDrawing();
         }

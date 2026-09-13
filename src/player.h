@@ -65,8 +65,8 @@ void InitializePlayer(Player *player)
     
     player->velocity = (Vector2){0, 0};
 
-    player->width = 64;
-    player->height = 64;
+    player->width = 96;
+    player->height = 96;
 
     player->hook.position = player->position;
     player->hook.direction = (Vector2){0.0f, 0.0f};
@@ -358,6 +358,24 @@ void UpdateGrappling(Player *player, Map *map)
 
 void InputHandling(Player *player, Map *map)
 {
+    if (IsKeyPressed(KEY_F1))
+    {
+        player->position = (Vector2){10000.0f, 9800.0f};
+        player->spawnPosition = player->position;
+        player->velocity = (Vector2){0.0f, 0.0f};
+
+        player->body.x = player->position.x;
+        player->body.y = player->position.y;
+
+        player->attack.x = player->position.x;
+        player->attack.y = player->position.y;
+
+        player->grounded = false;
+        player->doubleJumpAvailable = true;
+
+        TraceLog(LOG_INFO, "F1 TELEPORT ACTIVATED!");
+    }
+
     UpdateGrappling(player, map);
 
     if(player->state == DEATH)
