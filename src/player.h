@@ -5,9 +5,12 @@
 #include "constants.h"
 #include "grappling.h"
 #include "map.h"
-#include "boss.h"
 #include <math.h>
 #include <float.h>
+
+typedef struct Boss Boss;
+
+void BossStartAttack(Boss *boss);
 
 typedef struct Player
 {

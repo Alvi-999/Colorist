@@ -18,6 +18,9 @@ void UpdateGame(Player *player, Map *map, Boss *boss)
     UpdateMovement(player);
     UpdatePlayerState(player);
 
+    CheckBossCollision(boss, player);
+    UpdateBoss(boss, player);
+
     GreenCollision(player, map);
     RedCollision(player, map);
     YellowCollision(player, map);

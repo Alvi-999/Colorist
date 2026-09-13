@@ -1,7 +1,8 @@
 #pragma once
 
 #include <raylib.h>
-#include "player.h"
+
+typedef struct Player Player;
 
 typedef struct Boss
 {
@@ -24,6 +25,9 @@ typedef struct Boss
 
     bool attacking;
     bool attackHitPlayer;
+
+    Texture2D sprite;
+
 } Boss;
 
 void InitialBoss(Boss *boss)
@@ -48,6 +52,30 @@ void InitialBoss(Boss *boss)
 
     boss->active = true;
     boss->defeated = false;
+
+    boss->sprite = LoadTexture("assets/bidle/bidle-1.png");
+}
+
+void CheckBossCollision(Boss *boss, Player *player)
+{
+    if(!boss->active || boss->defeated)
+    {
+        return;
+    }
+
+    if(CheckCollisionRecs(player->body, boss->body))
+    {
+        if(player->body.x < boss->body.x)
+        {
+            player->position.x = boss->body.x - player->width;
+        }
+        else 
+        {
+            player->position.x = boss->body.x + boss->width;
+        }
+
+        player->body.x = player->position.x;
+    }
 }
 
 void BossStartAttack(Boss *boss)
@@ -94,11 +122,33 @@ void BossReceiveHit(Boss *boss)
 
 void DrawBoss(Boss *boss)
 {
-    if(!boss->active || boss->defeated) return;
+    if(!boss->active || boss->defeated)
+    {
+        return;
+    }
 
-    DrawRectangle((int)boss->position.x, (int)boss->position.y, (int)boss->width, (int)boss->height, PURPLE);
+    Rectangle source = {
+        0.0f,
+        0.0f,
+        (float)boss->sprite.width,
+        (float)boss->sprite.height
+    };
 
-    DrawRectangleLines((int)boss->position.x, (int)boss->position.y, (int)boss->width, (int)boss->height, WHITE);
+    Rectangle destination = {
+        boss->position.x,
+        boss->position.y,
+        boss->width,
+        boss->height
+    };
+
+    DrawTexturePro(
+        boss->sprite,
+        source,
+        destination,
+        (Vector2){0.0f, 0.0f},
+        0.0f,
+        WHITE
+    );
 }
 
 void DrawBossHealth(Boss *boss)
@@ -139,12 +189,15 @@ void UpdateBoss(Boss *boss, Player *player)
         return;
     }
 
+    boss->body.x = boss->position.x;
+    boss->body.y = boss->position.y;
+
     if(boss->attacking)
     {
-        if(!boss->attackHitPlayer && CheckCollisionCircleRecs(boss->attack, player->body))
+        if(!boss->attackHitPlayer &&
+           CheckCollisionRecs(boss->attack, player->body))
         {
             TakeDamage(player, 1);
-
             boss->attackHitPlayer = true;
 
             TraceLog(LOG_INFO, "Player hit by boss!");
