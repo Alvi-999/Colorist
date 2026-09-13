@@ -7,7 +7,6 @@
 #include "map.h"
 #include <math.h>
 #include <float.h>
-#include "menu.h"
 
 typedef struct Player
 {
@@ -28,6 +27,8 @@ typedef struct Player
     bool grounded;
     bool doubleJumpAvailable;
     bool inWater;
+    bool jumpanimationstop;
+    bool fallanimationstop;
     
     int state;
     
@@ -40,8 +41,6 @@ typedef struct Player
 
     GrapplingHook hook;
 } Player;
-
-#include "animation.h"
 
 void StartAttack(Player *player);
 void StartDefence(Player *player);
@@ -95,11 +94,15 @@ void InitializePlayer(Player *player)
     player->facingRight = true;
     player->grounded = false;
     player->doubleJumpAvailable = true;
+    player->jumpanimationstop = false;
+    player->fallanimationstop = false;
 
     player->state = IDLER;
     player->hits = MAX_HITS;
     player->framecount = 0;
 }
+
+#include "animation.h"
 
 
 bool CheckGrappleRectangle(Vector2 startPosition, Vector2 endPosition, Rectangle object, Vector2 *hitPosition)
@@ -145,6 +148,8 @@ void RespawnPlayer(Player *player)
     player->grounded = false;
     player->doubleJumpAvailable = true;
     player->inWater = false;
+    player->jumpanimationstop = false;
+    player->fallanimationstop = false;
 
     player->defending = false;
     player->attackTimer = 0;
@@ -461,12 +466,39 @@ void DrawPlayer(Player *player)
             UnloadTexture(player->sprite);
             player->sprite = RunRightAnimation(player);
             break;
-        
-        case 4: //jump
-            break;
 
-        case 5: //fall
+        case 5: //jump
+            if(player->framecount/5+1 > 6)
+            {
+                player->jumpanimationstop = true;
+            }
+            if(!player->jumpanimationstop)
+            {
+                UnloadTexture(player->sprite);
+                player->sprite = JumpAnimation(player);
+            }
             break;
+        case 6: //fall
+            if(player->framecount/5+1 > 6)
+            {
+                player->fallanimationstop = true;
+            }
+            if(!player->fallanimationstop)
+            {
+                UnloadTexture(player->sprite);
+                player->sprite = FallAnimation(player);
+            }
+            break;
+        case 11: //landing
+        if(player->framecount/5+1 > 6)
+        {
+            player->state = player->facingRight ? IDLER : IDLEL;
+            player->framecount = 0;
+            break;
+        }
+        UnloadTexture(player->sprite);
+        player->sprite = FallAnimationWhileGround(player); //animation is not working, but will not change it as it still looks good
+        break;
 
     }
 
@@ -552,5 +584,11 @@ void UpdatePlayerState(Player *player)
     if(previous_state != player->state)
     {
         player->framecount = 0;
+        if(player->fallanimationstop)
+        {
+            player->state = LANDING;
+        }
+        player->fallanimationstop = false;
+        player->jumpanimationstop = false;
     }
 }

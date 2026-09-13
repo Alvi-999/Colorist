@@ -27,6 +27,7 @@ int Menu_State;
 #define DASH 8
 #define DEFEND 9
 #define DEATH 10
+#define LANDING 11
 
 #define ATTACK_STARTUP 5
 #define ATTACK_ACTIVE 10
