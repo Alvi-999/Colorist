@@ -12,7 +12,7 @@ int main()
     InitWindow(1920, 1080, "Colorist");
     SetTargetFPS(60);
 
-    PlayIntro();
+    // PlayIntro();
 
     InitializeMenu();
 
@@ -68,6 +68,10 @@ int main()
         {
             UnloadAllMenuTexture();
             break;
+        }
+        else if(Menu_State == MENU_BOSS)
+        {
+            DrawBossMap();
         }
     }
 

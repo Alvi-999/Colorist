@@ -2,6 +2,7 @@
 
 #include "raylib.h"
 #include "constants.h"
+#include "bossmap.h"
 
 int Menu_Framecount = 0;
 
@@ -100,6 +101,11 @@ void UpdateMenu()
         {
             Menu_State = MENU_QUIT;
         }
+    }
+    else if( IsKeyDown(KEY_B) )
+    {
+        InitializeBossMap();
+        Menu_State = MENU_BOSS;
     }
 }
 
