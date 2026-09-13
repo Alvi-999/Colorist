@@ -7,6 +7,7 @@
 #include "map.h"
 #include <math.h>
 #include <float.h>
+#include "menu.h"
 
 typedef struct Player
 {
@@ -374,6 +375,8 @@ void InputHandling(Player *player, Map *map)
         player->doubleJumpAvailable = true;
 
         TraceLog(LOG_INFO, "F1 CHEAT ACTIVATED!");
+
+        Menu_State = MENU_BOSS;
     }
 
     UpdateGrappling(player, map);

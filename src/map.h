@@ -256,9 +256,6 @@ void DrawMap(Map *map)
         DrawTexturePro(flatg1Tex, source, map->green[i].body, (Vector2){0, 0}, 0.0f, WHITE);
     }
 
-    // DrawRectangleRec(map->green[14].body, DARKGRAY);
-
-
     // -------------------------- Red -----------------------------
     for (int i = 0; i <= 2; i++)
     {

@@ -53,7 +53,7 @@ int main()
             DrawMenu();
             EndDrawing();
         }
-        else if (Menu_State == MENU_GAME)
+        else if (Menu_State == MENU_GAME || Menu_State == MENU_BOSS)
         {
             UpdateGame(&player, &map);
 
