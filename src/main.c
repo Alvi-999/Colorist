@@ -17,7 +17,8 @@ int main()
     Player player;
     Map map;
     Camera2D MainCamera;
-    
+    Boss boss;
+
     InitializePlayer(&player);
 
     LoadMap(&map);
@@ -41,13 +42,13 @@ int main()
             }
 
             BeginDrawing();
-                DrawMenu();
+            DrawMenu();
             EndDrawing();
         }
         else if (Menu_State == MENU_RULEBOOK) //Since ekhono rulebook design hoynai, oke main menu tei rakhbo
         {
             BeginDrawing();
-                DrawMenu();
+            DrawMenu();
             EndDrawing();
         }
         else if (Menu_State == MENU_GAME)
@@ -61,7 +62,7 @@ int main()
             ClearBackground(BLACK);
 
             BeginMode2D(MainCamera);
-                DrawGame(&player, &map);
+            DrawGame(&player, &map);
             EndMode2D();
 
             EndDrawing();

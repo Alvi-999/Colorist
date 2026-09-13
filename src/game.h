@@ -7,6 +7,7 @@
 #include "collision.h"
 #include "combat.h"
 #include "constants.h"
+#include "enemy.h"
 
 void UpdateGame(Player *player, Map *map)
 {
