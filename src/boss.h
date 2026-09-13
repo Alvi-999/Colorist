@@ -26,6 +26,9 @@ typedef struct Boss
     bool attacking;
     bool attackHitPlayer;
 
+    int attackTimer;
+    int attackCooldown;
+
     Texture2D sprite;
 
 } Boss;
@@ -54,6 +57,12 @@ void InitialBoss(Boss *boss)
     boss->defeated = false;
 
     boss->sprite = LoadTexture("assets/bidle/bidle-1.png");
+
+    boss->attacking = false;
+    boss->attackHitPlayer = false;
+
+    int attackTimer = 0;
+    int attackCooldown = 120;
 }
 
 void CheckBossCollision(Boss *boss, Player *player)
@@ -78,18 +87,20 @@ void CheckBossCollision(Boss *boss, Player *player)
     }
 }
 
-void BossStartAttack(Boss *boss)
+void BossStartGroundSlam(Boss *boss)
 {
-    if(!boss->active || boss->defeated)
+    if(!boss->active || boss->defeated || boss->attacking)
     {
         return;
     }
 
     boss->attacking = true;
     boss->attackHitPlayer = false;
+    boss->attackTimer = 0;
 
-    boss->attack = (Rectangle){(boss->position.x - 80), (boss->position.y + 30), 80, 100};
+    TraceLog(LOG_INFO, "BOSS GROUND SLAM STARTED!");
 }
+
 
 void BossReceiveHit(Boss *boss)
 {
@@ -125,6 +136,12 @@ void DrawBoss(Boss *boss)
     if(!boss->active || boss->defeated)
     {
         return;
+    }
+
+    if(boss->attacking && boss->attackTimer >= 36 && boss->attackTimer < 48)
+    {
+        DrawRectangleRec(boss->attack, RED);
+        DrawRectangleLinesEx(boss->attack, 3.0f, WHITE);
     }
 
     Rectangle source = {
@@ -181,7 +198,6 @@ void DrawBossHealth(Boss *boss)
         DrawRectangleLines((startX + i *(iconWidth + spacing)), startY, iconWidth, iconHeight, WHITE);
     }
 }
-
 void UpdateBoss(Boss *boss, Player *player)
 {
     if(!boss->active || boss->defeated)
@@ -189,18 +205,81 @@ void UpdateBoss(Boss *boss, Player *player)
         return;
     }
 
+    // Keep boss body updated
     boss->body.x = boss->position.x;
     boss->body.y = boss->position.y;
 
-    if(boss->attacking)
+
+    // ==================================================
+    // WAIT BEFORE ATTACKING
+    // ==================================================
+
+    if(!boss->attacking)
     {
-        if(!boss->attackHitPlayer &&
-           CheckCollisionRecs(boss->attack, player->body))
+        boss->attackCooldown--;
+
+        if(boss->attackCooldown <= 0)
+        {
+            BossStartGroundSlam(boss);
+        }
+
+        return;
+    }
+
+
+    // ==================================================
+    // ATTACK TIMER
+    // ==================================================
+
+    boss->attackTimer++;
+
+
+    // ==================================================
+    // PHASE 1: TRACK PLAYER
+    // Frames 1-35
+    // ==================================================
+
+    if(boss->attackTimer < 36)
+    {
+        if(player->position.x > boss->position.x)
+        {
+            boss->position.x += 3.0f;
+        }
+        else if(player->position.x < boss->position.x)
+        {
+            boss->position.x -= 3.0f;
+        }
+
+        boss->body.x = boss->position.x;
+    }
+
+    if(boss->attackTimer >= 36 &&
+       boss->attackTimer < 48)
+    {
+        boss->attack = (Rectangle){boss->position.x - 250.0f, boss->position.y + boss->height - 60.0f, boss->width + 500.0f, 60.0f};
+
+        if(!boss->attackHitPlayer && CheckCollisionRecs(boss->attack, player->body))
         {
             TakeDamage(player, 1);
+
             boss->attackHitPlayer = true;
 
-            TraceLog(LOG_INFO, "Player hit by boss!");
+            TraceLog(LOG_INFO, "GROUND SLAM HIT PLAYER!");
         }
+    }
+
+    if(boss->attackTimer >= 72)
+    {
+        boss->attacking = false;
+
+        boss->attackHitPlayer = false;
+
+        boss->attackTimer = 0;
+
+        boss->attackCooldown = 120;
+
+        boss->attack = (Rectangle){0, 0, 0, 0};
+
+        TraceLog(LOG_INFO, "GROUND SLAM FINISHED!");
     }
 }

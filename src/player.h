@@ -10,7 +10,7 @@
 
 typedef struct Boss Boss;
 
-void BossStartAttack(Boss *boss);
+void BossStartGroundSlam(Boss *boss);
 
 typedef struct Player
 {
@@ -391,7 +391,7 @@ void InputHandling(Player *player, Map *map, Boss *boss)
 
     if(IsKeyPressed(KEY_B))
     {
-        BossStartAttack(boss);
+        BossStartGroundSlam(boss);
     }
 
     if(player->state == ATTACK)
