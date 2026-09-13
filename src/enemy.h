@@ -2,6 +2,8 @@
 
 #include <raylib.h>
 #include "constants.h"
+#include "player.h"
+#include "math.h"
 
 typedef struct Boss
 {
@@ -19,7 +21,6 @@ typedef struct Boss
     int maxHealth;
     
     bool facingRight;
-    bool grounded;
     bool defending;
     
     float speed;
@@ -55,113 +56,101 @@ void InitializeBoss(Boss *boss, Vector2 spawnPosition)
     boss->health = boss->maxHealth;
 
     boss->facingRight = false;
-    boss->grounded = false;
     
     boss->state = BOSS_IDLE;
     boss->previousState = BOSS_IDLE;
     
     boss->attackTimer = 0;
-    boss->previousState = 0;
 
     boss->framecount = 0;
 
     // boss->sprite = ;
-
-    boss->state = BOSS_IDLE;
 }
 
 void UpdateBossAI(Boss *boss, Player *player)
 {
-    if(boss->health <= 0)
+    if (boss->health <= 0)
     {
         boss->state = BOSS_DEATH;
         return;
     }
 
-    if(boss->hurtTimer > 0)
+    if (boss->hurtTimer > 0)
     {
         boss->state = BOSS_STUNNED;
         return;
     }
 
     float distanceX = player->position.x - boss->position.x;
+
     float absoluteDistanceX = fabsf(distanceX);
 
-    if(distanceX > 0)
+    if (distanceX > 0)
     {
         boss->facingRight = true;
     }
-    else if(distanceX < 0)
+    else if (distanceX < 0)
     {
         boss->facingRight = false;
     }
 
-    if(absoluteDistanceX > BOSS_CHASE_DISTANCE)
+    if (absoluteDistanceX > BOSS_CHASE_DISTANCE)
     {
         boss->state = BOSS_IDLE;
     }
-    else if(absoluteDistanceX <= BOSS_STOP_DISTANCE)
+    else if (absoluteDistanceX <= BOSS_STOP_DISTANCE)
     {
         boss->state = BOSS_ATTACK;
     }
-    else 
+    else
     {
         boss->state = BOSS_RUN;
     }
-}
-
-
-void UpdateBoss(Boss *boss, Player *player)
-{
-    float distance = fabsf(player->position.x - boss->position.x);
-
-    if(distance > BOSS_CHASE_DISTANCE)
-    {
-        boss->state = BOSS_RUN;
-
-        if(player->position.x > boss->position.x)
-        {
-            boss->velocity.x = BOSS_SPEED;
-            boss->facingRight = true;
-        }
-        else 
-        {
-            boss->velocity.x = -BOSS_SPEED;
-            boss->facingRight = false;
-        }
-    }
-    else if(distance <= BOSS_STOP_DISTANCE)
-    {
-        boss->state = BOSS_IDLE;
-        boss->velocity.x = 0.0f;
-    }
-
-    boss->position.x = boss->position.x;
-    
-    boss->body.x = boss->position.x;
-    boss->body.y = boss->position.y;
 }
 
 void UpdateBossMovement(Boss *boss, Player *player)
 {
-    if(boss->state != BOSS_RUN)
+    if (boss->state != BOSS_RUN)
     {
+        boss->velocity.x = 0.0f;
         return;
     }
 
-    if(player->position.x > boss->position.x)
+    if (player->position.x > boss->position.x)
     {
         boss->velocity.x = BOSS_SPEED;
         boss->facingRight = true;
     }
-    else if(player->position.x < boss->position.x)
+    else if (player->position.x < boss->position.x)
     {
         boss->velocity.x = -BOSS_SPEED;
         boss->facingRight = false;
     }
+    else
+    {
+        boss->velocity.x = 0.0f;
+    }
+
+    boss->position.x += boss->velocity.x;
 
     boss->body.x = boss->position.x;
     boss->body.y = boss->position.y;
+}
+
+void BossTakeDamage(Boss *boss, int damage)
+{
+   if(boss->state == BOSS_DEATH || boss->state == BOSS_BLOCK)
+   {
+        return;
+   } 
+
+   boss->health -= damage;
+
+   if(boss->health <= 0)
+   {
+        boss->health = 0;
+        boss->state = BOSS_DEATH;
+   }   
 }
 
 void UpdateBossBlock(Boss *boss, Player *player)
@@ -177,6 +166,7 @@ void UpdateBossBlock(Boss *boss, Player *player)
     if(player->state == ATTACK && absoluteDistanceX <= BOSS_STOP_DISTANCE)
     {
         boss->state = BOSS_BLOCK;
+        boss->velocity.x = 0.0f;
         return;
     }
 
