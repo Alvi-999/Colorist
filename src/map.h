@@ -36,6 +36,8 @@ typedef struct Map
 {
     Texture2D background;
     Texture2D background_star;
+    Texture2D BossMapGround;
+    Texture2D BossMap;
 
     Green green[15];
 
@@ -79,7 +81,7 @@ void LoadMap(Map *map)
     map->green[11].body = (Rectangle) {3956, 945, 243, 58};
     map->green[12].body = (Rectangle) {4239, 1647, 202, 54};
     map->green[13].body = (Rectangle) {4707, 860, 230, 63};
-    map->green[14].body = (Rectangle) {10000, 1550, 3840, 300};
+    map->green[14].body = (Rectangle) {10000, 1560, 5760, 235}; //boss fight base
 
     //-------------------- Red platform ------------------------
     //floatr1
@@ -213,12 +215,17 @@ void DrawMap(Map *map)
         map->background = LoadTexture("assets/bg.png");
         map->background_star = LoadTexture("assets/star.png");
 
+        map->BossMapGround = LoadTexture("assets/boss_ground.png");
+        map->BossMap = LoadTexture("assets/bossmap.png");
+
         texturesLoaded = true;
     }
 
-    //------------------backgorund-------------------
+    //------------------backgorund and boss-------------------
     DrawTexture(map->background, 0, 0, WHITE);
     DrawTexture(map->background_star, 0, 0, WHITE);
+    DrawTexture(map->BossMap, 10000, 705, WHITE);
+    DrawTexture(map->BossMapGround, 10000, 1550, WHITE);
 
     // -------------------- Green ----------------------
     for (int i = 0; i <= 1; i++)
@@ -249,7 +256,7 @@ void DrawMap(Map *map)
         DrawTexturePro(flatg1Tex, source, map->green[i].body, (Vector2){0, 0}, 0.0f, WHITE);
     }
 
-    DrawRectangleRec(map->green[14].body, DARKGRAY);
+    // DrawRectangleRec(map->green[14].body, DARKGRAY);
 
 
     // -------------------------- Red -----------------------------
