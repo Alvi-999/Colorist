@@ -13,7 +13,7 @@ int main()
     InitWindow(1920, 1080, "Colorist");
     SetTargetFPS(60);
 
-    PlayIntro();
+    // PlayIntro();
 
     InitializeMenu();
 

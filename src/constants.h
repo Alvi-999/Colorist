@@ -50,6 +50,7 @@ const int MAX_HITS = 5;
 #define MENU_RULEBOOK 2
 #define MENU_GAME 3
 #define MENU_QUIT 4
+#define MENU_BOSS 5
 
 #define BOSS_IDLE 30
 #define BOSS_RUN 31

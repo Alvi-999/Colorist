@@ -18,19 +18,26 @@ void UpdateMainCamera(Camera2D *MainCamera, Player *player)
     float screenWidth = (float)GetScreenWidth();
     float screenHeight = (float)GetScreenHeight();
 
-    float CameraCenterX = max(player->position.x, 1920.0/2);
-    CameraCenterX = min(CameraCenterX, 5760.0-(1920.0/2));
+    float CameraCenterX = player->position.x;
+    float CameraCenterY = player->position.y;
 
-    float CameraCenterY = max(player->position.y, 1080.0/2);
-
-    if(CameraCenterY > 2160)
+    // Keep the camera from going above the top of the map
+    if (CameraCenterY < screenHeight / 2.0f)
     {
-        player->position.x = 546;
-        player->position.y = 76;
-        Menu_State = MENU_MAIN;
+        CameraCenterY = screenHeight / 2.0f;
     }
 
-    MainCamera->target = (Vector2){CameraCenterX, CameraCenterY};
-    MainCamera->offset = (Vector2){(float)screenWidth/2, (float)screenHeight/2};
+    // No old 5760 X limit
+    // No forced return to the main menu
+
+    MainCamera->target = (Vector2){
+        CameraCenterX,
+        CameraCenterY
+    };
+
+    MainCamera->offset = (Vector2){
+        screenWidth / 2.0f,
+        screenHeight / 2.0f
+    };
 }
 

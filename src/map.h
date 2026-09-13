@@ -79,7 +79,7 @@ void LoadMap(Map *map)
     map->green[11].body = (Rectangle) {3956, 945, 243, 58};
     map->green[12].body = (Rectangle) {4239, 1647, 202, 54};
     map->green[13].body = (Rectangle) {4707, 860, 230, 63};
-    map->green[14].body = (Rectangle) {10000, 10000, 3840, 300};
+    map->green[14].body = (Rectangle) {10000, 1550, 3840, 300};
 
     //-------------------- Red platform ------------------------
     //floatr1

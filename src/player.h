@@ -360,7 +360,7 @@ void InputHandling(Player *player, Map *map)
 {
     if (IsKeyPressed(KEY_F1))
     {
-        player->position = (Vector2){10000.0f, 9800.0f};
+        player->position = (Vector2){10000.0f, 1400.0f};
         player->spawnPosition = player->position;
         player->velocity = (Vector2){0.0f, 0.0f};
 
@@ -373,7 +373,7 @@ void InputHandling(Player *player, Map *map)
         player->grounded = false;
         player->doubleJumpAvailable = true;
 
-        TraceLog(LOG_INFO, "F1 TELEPORT ACTIVATED!");
+        TraceLog(LOG_INFO, "F1 CHEAT ACTIVATED!");
     }
 
     UpdateGrappling(player, map);
