@@ -35,6 +35,7 @@ typedef struct Green
 typedef struct Map
 {
     Texture2D background;
+    Texture2D background_star;
 
     Green green[14];
 
@@ -163,7 +164,7 @@ void LoadMap(Map *map)
     map->greenCount = 14;
     map->redCount = 17;
     map->blueCount = 11;
-    map->yellowCount = 17; 
+    map->yellowCount = 17;
 }
 
 
@@ -208,8 +209,15 @@ void DrawMap(Map *map)
         floaty2Tex  = LoadTexture("assets/floaty2.png");
         flaty1Tex   = LoadTexture("assets/flaty1.png");
 
+        map->background = LoadTexture("assets/bg.png");
+        map->background_star = LoadTexture("assets/star.png");
+
         texturesLoaded = true;
     }
+
+    //------------------backgorund-------------------
+    DrawTexture(map->background, 0, 0, WHITE);
+    DrawTexture(map->background_star, 0, 0, WHITE);
 
     // -------------------- Green ----------------------
     for (int i = 0; i <= 1; i++)
