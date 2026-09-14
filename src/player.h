@@ -8,6 +8,10 @@
 #include <math.h>
 #include <float.h>
 
+typedef struct Boss Boss;
+
+void BossStartGroundSlam(Boss *boss);
+
 typedef struct Player
 {
     Vector2 position;
@@ -46,7 +50,7 @@ void StartAttack(Player *player);
 void StartDefence(Player *player);
 void TakeDamage(Player *player, int damage);
 void InitializePlayer(Player *player);
-void InputHandling(Player *player, Map *map);
+void InputHandling(Player *player, Map *map, Boss *boss);
 void UpdatePlayerState(Player *player);
 void UpdateMovement(Player *player);
 void DrawPlayer(Player *player);
@@ -362,7 +366,7 @@ void UpdateGrappling(Player *player, Map *map)
     }
 }
 
-void InputHandling(Player *player, Map *map)
+void InputHandling(Player *player, Map *map, Boss *boss)
 {
     if (IsKeyPressed(KEY_F1))
     {
@@ -392,6 +396,11 @@ void InputHandling(Player *player, Map *map)
     }
 
     player->velocity.x = 0;
+
+    if(IsKeyPressed(KEY_B))
+    {
+        BossStartGroundSlam(boss);
+    }
 
     if(player->state == ATTACK)
     {
@@ -441,33 +450,32 @@ void InputHandling(Player *player, Map *map)
 
 void DrawPlayer(Player *player)
 {
-    // Player animation goes here
     player->framecount++;
     player->framecount = player->framecount % 60;
 
     switch(player->state)
     {
-        case 0: //idlel
+        case 0: 
             UnloadTexture(player->sprite);
             player->sprite = IdleLeftAnimation(player);
             break;
 
-        case 1: //idler
+        case 1: 
             UnloadTexture(player->sprite);
             player->sprite = IdleRightAnimation(player);
             break;
 
-        case 2: //runl
+        case 2: 
             UnloadTexture(player->sprite);
             player->sprite = RunLeftAnimation(player);
             break;
 
-        case 3: //runr
+        case 3: 
             UnloadTexture(player->sprite);
             player->sprite = RunRightAnimation(player);
             break;
 
-        case 5: //jump
+        case 5: 
             if(player->framecount/5+1 > 6)
             {
                 player->jumpanimationstop = true;
@@ -478,7 +486,7 @@ void DrawPlayer(Player *player)
                 player->sprite = JumpAnimation(player);
             }
             break;
-        case 6: //fall
+        case 6: 
             if(player->framecount/5+1 > 6)
             {
                 player->fallanimationstop = true;
@@ -489,7 +497,7 @@ void DrawPlayer(Player *player)
                 player->sprite = FallAnimation(player);
             }
             break;
-        case 11: //landing
+        case 11:
         if(player->framecount/5+1 > 6)
         {
             player->state = player->facingRight ? IDLER : IDLEL;
@@ -546,10 +554,8 @@ void UpdateMovement(Player *player)
         return;
     }
 
-    //gravity
     player->velocity.y += GRAVITY;
 
-    //MOVE PLAYER
     player->position.x += player->velocity.x;
     player->body.x = player->position.x;
 
