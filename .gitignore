@@ -18,16 +18,3 @@ cmake_install.cmake
 # Debug files
 *.pdb
 
-# FFmpeg downloaded DLLs
-avcodec-*.dll
-avdevice-*.dll
-avfilter-*.dll
-avformat-*.dll
-avutil-*.dll
-swresample-*.dll
-swscale-*.dll
-
-# FFmpeg executables
-ffmpeg.exe
-ffplay.exe
-ffprobe.exe
