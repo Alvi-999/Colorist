@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdio.h>
 #include <raylib.h>
 
 typedef struct Player Player;
@@ -28,6 +29,11 @@ typedef struct Boss
 
     int attackTimer;
     int attackCooldown;
+
+    Texture2D idleSprites[12];
+    int idleFrame;
+    float idleTimer;
+    float idleFrameTime;
 
     Texture2D sprite;
 
@@ -61,8 +67,25 @@ void InitialBoss(Boss *boss)
     boss->attacking = false;
     boss->attackHitPlayer = false;
 
-    int attackTimer = 0;
-    int attackCooldown = 120;
+    boss->attackTimer = 0;
+    boss->attackCooldown = 120;
+
+    boss->idleSprites[0] = LoadTexture("assets/bidle/bidle-1.png");
+    boss->idleSprites[1] = LoadTexture("assets/bidle/bidle-2.png");
+    boss->idleSprites[2] = LoadTexture("assets/bidle/bidle-3.png");
+    boss->idleSprites[3] = LoadTexture("assets/bidle/bidle-4.png");
+    boss->idleSprites[4] = LoadTexture("assets/bidle/bidle-5.png");
+    boss->idleSprites[5] = LoadTexture("assets/bidle/bidle-6.png");
+    boss->idleSprites[6] = LoadTexture("assets/bidle/bidle-7.png");
+    boss->idleSprites[7] = LoadTexture("assets/bidle/bidle-8.png");
+    boss->idleSprites[8] = LoadTexture("assets/bidle/bidle-9.png");
+    boss->idleSprites[9] = LoadTexture("assets/bidle/bidle-10.png");
+    boss->idleSprites[10] = LoadTexture("assets/bidle/bidle-11.png");
+    boss->idleSprites[11] = LoadTexture("assets/bidle/bidle-12.png");
+
+    boss->idleFrame = 0;
+    boss->idleTimer = 0.0f;
+    boss->idleFrameTime = 0.15f;
 }
 
 void CheckBossCollision(Boss *boss, Player *player)
@@ -198,6 +221,8 @@ void DrawBossHealth(Boss *boss)
         DrawRectangleLines((startX + i *(iconWidth + spacing)), startY, iconWidth, iconHeight, WHITE);
     }
 }
+
+
 void UpdateBoss(Boss *boss, Player *player)
 {
     if(!boss->active || boss->defeated)
@@ -205,14 +230,29 @@ void UpdateBoss(Boss *boss, Player *player)
         return;
     }
 
-    // Keep boss body updated
+    boss->idleTimer += GetFrameTime();
+
+    if(boss->idleTimer >= boss->idleFrameTime)
+    {
+        boss->idleTimer = 0.0f;
+        boss->idleFrame++;
+
+        if(boss->idleFrame >= 12)
+        {
+            boss->idleFrame = 0;
+        }
+
+        UnloadTexture(boss->sprite);
+
+        char path[100];
+
+        sprintf(path, "assets/bidle/bidle-%d.png", boss->idleFrame + 1);
+
+        boss->sprite = LoadTexture(path);
+    }
+
     boss->body.x = boss->position.x;
     boss->body.y = boss->position.y;
-
-
-    // ==================================================
-    // WAIT BEFORE ATTACKING
-    // ==================================================
 
     if(!boss->attacking)
     {
@@ -226,18 +266,7 @@ void UpdateBoss(Boss *boss, Player *player)
         return;
     }
 
-
-    // ==================================================
-    // ATTACK TIMER
-    // ==================================================
-
     boss->attackTimer++;
-
-
-    // ==================================================
-    // PHASE 1: TRACK PLAYER
-    // Frames 1-35
-    // ==================================================
 
     if(boss->attackTimer < 36)
     {
@@ -256,9 +285,16 @@ void UpdateBoss(Boss *boss, Player *player)
     if(boss->attackTimer >= 36 &&
        boss->attackTimer < 48)
     {
-        boss->attack = (Rectangle){boss->position.x - 250.0f, boss->position.y + boss->height - 60.0f, boss->width + 500.0f, 60.0f};
+        boss->attack = (Rectangle)
+        {
+            boss->position.x - 250.0f,
+            boss->position.y + boss->height - 60.0f,
+            boss->width + 500.0f,
+            60.0f
+        };
 
-        if(!boss->attackHitPlayer && CheckCollisionRecs(boss->attack, player->body))
+        if(!boss->attackHitPlayer &&
+           CheckCollisionRecs(boss->attack, player->body))
         {
             TakeDamage(player, 1);
 

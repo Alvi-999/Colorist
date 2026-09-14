@@ -8,14 +8,12 @@ const int COLLISION_RIGHT = 4;
 
 const int YELLOW_BREAK_TIME = 37;
 
-// Physics constants
 const float GRAVITY = 1.00f;
 const float MOVE_SPEED = 5.0f;
 const float JUMP_FORCE = -20.0f;
 
 int Menu_State;
 
-// Player states
 #define IDLEL 0
 #define IDLER 1
 #define RUNL 2
@@ -44,9 +42,8 @@ const float HOOK_MAX_DISTANCE = 450.0f;
 
 #define ATTACK_DAMAGE 1
 
-const int MAX_HITS = 5;
+const int MAX_HITS = 10;
 
-// Menu state
 #define MENU_MAIN 1
 #define MENU_RULEBOOK 2
 #define MENU_GAME 3

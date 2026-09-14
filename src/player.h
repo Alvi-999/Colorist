@@ -38,11 +38,11 @@ typedef struct Player
     
     int hits;
     int framecount;
+    Texture2D healthFull;
     
-    // Combat
     int attackTimer;
     bool defending;
-
+    
     GrapplingHook hook;
 } Player;
 
@@ -71,6 +71,8 @@ void InitializePlayer(Player *player)
 
     player->width = 96;
     player->height = 96;
+
+    player->healthFull = LoadTexture("assets/player_life.png");
 
     player->hook.position = player->position;
     player->hook.direction = (Vector2){0.0f, 0.0f};
@@ -138,6 +140,24 @@ bool CheckGrappleRectangle(Vector2 startPosition, Vector2 endPosition, Rectangle
     return true;
 }
 
+void DrawPlayerHealth(Player *player)
+{
+    int startX = 30;
+    int startY = 30;
+
+    int healthWidth = 40;
+    int healthHeight = 40;
+    int gap = 5;
+
+    for(int i = 0; i < player->hits; i++)
+    {
+        Rectangle source = {0, 0, (float)player->healthFull.width, (float)player->healthFull.height};
+
+        Rectangle destination = {(startX + i * (healthWidth + gap)), startY, healthWidth, healthHeight};
+
+        DrawTexturePro(player->healthFull, source, destination, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+}
 void RespawnPlayer(Player *player)
 {
     player->position = player->spawnPosition;
@@ -397,6 +417,7 @@ void InputHandling(Player *player, Map *map, Boss *boss)
 
     player->velocity.x = 0;
 
+    
     if(IsKeyPressed(KEY_B))
     {
         BossStartGroundSlam(boss);

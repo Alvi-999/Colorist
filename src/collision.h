@@ -84,6 +84,9 @@ void ResolveCollision(Player *player, Rectangle *platform, int side)
         player->position.x = player->body.x;
 
         player->velocity.x = 0;
+
+        player->doubleJumpAvailable = true;
+        player->grounded = true;
     }
 
     else if(side == COLLISION_RIGHT)
@@ -92,6 +95,9 @@ void ResolveCollision(Player *player, Rectangle *platform, int side)
         player->position.x = player->body.x;
 
         player->velocity.x = 0;
+
+        player->doubleJumpAvailable = true;
+        player->grounded = true;
     }
 }
 
@@ -161,12 +167,10 @@ void BlueCollision(Player *player, Map *map)
 
             if(player->body.y >= surface)
             {
-                // Player is below the surface -> float upward
                 player->velocity.y -= water.buoyancy;
             }
             else
             {
-                // Keep the player on the surface
                 player->body.y = surface;
                 player->position.y = surface;
                 player->velocity.y = 0;
