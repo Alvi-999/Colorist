@@ -5,18 +5,24 @@
 #include "map.h"
 #include "camera.h"
 #include "menu.h"
+#include "intro.h"
+#include "boss.h"
 
 int main()
 {
     InitWindow(1920, 1080, "Colorist");
     SetTargetFPS(60);
 
+    PlayIntro();
+
     InitializeMenu();
 
     Player player;
     Map map;
     Camera2D MainCamera;
-    
+    Boss boss;
+
+    InitialBoss(&boss);
     InitializePlayer(&player);
 
     LoadMap(&map);
@@ -25,6 +31,10 @@ int main()
 
     while(!WindowShouldClose())
     {
+        if(IsKeyPressed(KEY_F11))
+        {
+            ToggleFullscreen();
+        }
 
         if (Menu_State == MENU_MAIN)
         {
@@ -36,18 +46,18 @@ int main()
             }
 
             BeginDrawing();
-                DrawMenu();
+            DrawMenu();
             EndDrawing();
         }
         else if (Menu_State == MENU_RULEBOOK) //Since ekhono rulebook design hoynai, oke main menu tei rakhbo
         {
             BeginDrawing();
-                DrawMenu();
+            DrawMenu();
             EndDrawing();
         }
-        else if (Menu_State == MENU_GAME)
+        else if (Menu_State == MENU_GAME || Menu_State == MENU_BOSS)
         {
-            UpdateGame(&player, &map);
+            UpdateGame(&player, &map, &boss);
 
             UpdateMainCamera(&MainCamera, &player);
 
@@ -56,8 +66,13 @@ int main()
             ClearBackground(BLACK);
 
             BeginMode2D(MainCamera);
-                DrawGame(&player, &map);
+
+            DrawGame(&player, &map, &boss);
+
             EndMode2D();
+
+            DrawPlayerHealth(&player);
+            DrawBossHealth(&boss);
 
             EndDrawing();
         }

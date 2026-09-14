@@ -8,12 +8,12 @@ const int COLLISION_RIGHT = 4;
 
 const int YELLOW_BREAK_TIME = 37;
 
-// Physics constants
 const float GRAVITY = 1.00f;
 const float MOVE_SPEED = 5.0f;
-const float JUMP_FORCE = -15.0f;
+const float JUMP_FORCE = -20.0f;
 
-// Player states
+int Menu_State;
+
 #define IDLEL 0
 #define IDLER 1
 #define RUNL 2
@@ -25,6 +25,7 @@ const float JUMP_FORCE = -15.0f;
 #define DASH 8
 #define DEFEND 9
 #define DEATH 10
+#define LANDING 11
 
 #define ATTACK_STARTUP 5
 #define ATTACK_ACTIVE 10
@@ -41,10 +42,24 @@ const float HOOK_MAX_DISTANCE = 450.0f;
 
 #define ATTACK_DAMAGE 1
 
-const int MAX_HITS = 5;
+const int MAX_HITS = 10;
 
-// Menu state
 #define MENU_MAIN 1
 #define MENU_RULEBOOK 2
 #define MENU_GAME 3
 #define MENU_QUIT 4
+#define MENU_BOSS 5
+
+#define BOSS_IDLE 30
+#define BOSS_RUN 31
+#define BOSS_ATTACK 32
+#define BOSS_BLOCK 33
+#define BOSS_STUNNED 34
+#define BOSS_DEATH 35
+
+#define BOSS_MAX_HEALTH_BARS 10
+#define BOSS_HITS_PER_BAR    3
+
+#define BOSS_CHASE_DISTANCE 250.0f
+#define BOSS_STOP_DISTANCE 80.0f
+#define BOSS_SPEED 2.0f

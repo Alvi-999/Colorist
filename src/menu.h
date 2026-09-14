@@ -1,7 +1,8 @@
+#pragma once
+
 #include "raylib.h"
 #include "constants.h"
 
-int Menu_State;
 int Menu_Framecount = 0;
 
 Texture2D blank_menu;

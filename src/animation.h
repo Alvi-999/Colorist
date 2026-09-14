@@ -37,6 +37,60 @@ Texture2D IdleLeftAnimation(Player *player)
     return CurrentAnimationFrame;
 }
 
+Texture2D JumpAnimation(Player *player)
+{
+    char CurrentAnimationString[30];
+    snprintf(CurrentAnimationString, sizeof(CurrentAnimationString), "jump/jump-%d.png", player->framecount/5 + 1);
+
+    Image img = LoadImage(CurrentAnimationString);
+
+    if(!player->facingRight)
+    {
+        ImageFlipHorizontal(&img);
+    }
+
+    Texture2D CurrentAnimationFrame = LoadTextureFromImage(img);
+    UnloadImage(img);
+
+    return CurrentAnimationFrame;
+}
+
+Texture2D FallAnimation(Player *player)
+{
+    char CurrentAnimationString[30];
+    snprintf(CurrentAnimationString, sizeof(CurrentAnimationString), "fall/fall-%d.png", player->framecount/5 + 1);
+
+    Image img = LoadImage(CurrentAnimationString);
+
+    if(!player->facingRight)
+    {
+        ImageFlipHorizontal(&img);
+    }
+
+    Texture2D CurrentAnimationFrame = LoadTextureFromImage(img);
+    UnloadImage(img);
+
+    return CurrentAnimationFrame;
+}
+
+Texture2D FallAnimationWhileGround(Player *player)
+{
+    char CurrentAnimationString[30];
+    snprintf(CurrentAnimationString, sizeof(CurrentAnimationString), "fall/fall-%d.png", player->framecount/5 + 1 + 6);
+
+    Image img = LoadImage(CurrentAnimationString);
+
+    if(!player->facingRight)
+    {
+        ImageFlipHorizontal(&img);
+    }
+
+    Texture2D CurrentAnimationFrame = LoadTextureFromImage(img);
+    UnloadImage(img);
+
+    return CurrentAnimationFrame;
+}
+
 Texture2D HookShootingAnimation(Player *player)
 {
     char CurrentAnimationString[60];

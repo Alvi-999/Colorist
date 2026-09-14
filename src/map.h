@@ -35,8 +35,11 @@ typedef struct Green
 typedef struct Map
 {
     Texture2D background;
+    Texture2D background_star;
+    Texture2D BossMapGround;
+    Texture2D BossMap;
 
-    Green green[14];
+    Green green[15];
 
     Red red[17];
 
@@ -53,9 +56,7 @@ typedef struct Map
 
 void LoadMap(Map *map)
 {
-    // Ground
-    //-------------------- Green platform ------------------------
-    //groundg1
+
     map->green[0].body = (Rectangle) {104, 716, 450, 360};
     map->green[1].body = (Rectangle) {1044, 1881, 428, 288};
 
@@ -78,8 +79,9 @@ void LoadMap(Map *map)
     map->green[11].body = (Rectangle) {3956, 945, 243, 58};
     map->green[12].body = (Rectangle) {4239, 1647, 202, 54};
     map->green[13].body = (Rectangle) {4707, 860, 230, 63};
+    map->green[14].body = (Rectangle) {10000, 1560, 5760, 235};
 
-    //-------------------- Red platform ------------------------
+
     //floatr1
     map->red[0].body = (Rectangle){1616, 72, 261, 450};
     map->red[1].body = (Rectangle){1845, 1472, 176, 360};
@@ -105,7 +107,6 @@ void LoadMap(Map *map)
     map->red[15].body = (Rectangle){3483, 1188, 256, 382};
     map->red[16].body = (Rectangle){4838, 1580, 212, 396};
 
-    //-------------------- Blue platform ------------------------
     // floatb1
     map->blue[0].body = (Rectangle){1143, 1246, 315, 405};
     map->blue[1].body = (Rectangle){1426, 693, 356, 382};
@@ -128,7 +129,6 @@ void LoadMap(Map *map)
         map->blue[i].buoyancy = 2.0f;
     }
 
-    //-------------------- Yellow platform ------------------------
     //groundy2
     map->yellow[0].body = (Rectangle){3420, 1800, 342, 369};
     
@@ -160,10 +160,10 @@ void LoadMap(Map *map)
         map->yellow[i].breakTimer = 0;
     }
 
-    map->greenCount = 14;
+    map->greenCount = 15;
     map->redCount = 17;
     map->blueCount = 11;
-    map->yellowCount = 17; 
+    map->yellowCount = 17;
 }
 
 
@@ -208,8 +208,20 @@ void DrawMap(Map *map)
         floaty2Tex  = LoadTexture("assets/floaty2.png");
         flaty1Tex   = LoadTexture("assets/flaty1.png");
 
+        map->background = LoadTexture("assets/bg.png");
+        map->background_star = LoadTexture("assets/star.png");
+
+        map->BossMapGround = LoadTexture("assets/boss_ground.png");
+        map->BossMap = LoadTexture("assets/bossmap.png");
+
         texturesLoaded = true;
     }
+
+    //------------------backgorund and boss-------------------
+    DrawTexture(map->background, 0, 0, WHITE);
+    DrawTexture(map->background_star, 0, 0, WHITE);
+    DrawTexture(map->BossMap, 10000, 705, WHITE);
+    DrawTexture(map->BossMapGround, 10000, 1550, WHITE);
 
     // -------------------- Green ----------------------
     for (int i = 0; i <= 1; i++)
@@ -283,7 +295,6 @@ void DrawMap(Map *map)
         DrawTexturePro(flatb1Tex, source, map->blue[i].body, (Vector2){0, 0}, 0.0f, WHITE);
     }
 
-    // -------------------------------- Yellow ----------------------------------------
     if (!map->yellow[0].broken)
     {
         Rectangle source = {0, 0, (float)groundy2Tex.width, (float)groundy2Tex.height};

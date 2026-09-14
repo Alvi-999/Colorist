@@ -8,6 +8,10 @@
 #include <math.h>
 #include <float.h>
 
+typedef struct Boss Boss;
+
+void BossStartGroundSlam(Boss *boss);
+
 typedef struct Player
 {
     Vector2 position;
@@ -27,26 +31,26 @@ typedef struct Player
     bool grounded;
     bool doubleJumpAvailable;
     bool inWater;
+    bool jumpanimationstop;
+    bool fallanimationstop;
     
     int state;
     
     int hits;
     int framecount;
+    Texture2D healthFull;
     
-    // Combat
     int attackTimer;
     bool defending;
-
+    
     GrapplingHook hook;
 } Player;
-
-#include "animation.h"
 
 void StartAttack(Player *player);
 void StartDefence(Player *player);
 void TakeDamage(Player *player, int damage);
 void InitializePlayer(Player *player);
-void InputHandling(Player *player, Map *map);
+void InputHandling(Player *player, Map *map, Boss *boss);
 void UpdatePlayerState(Player *player);
 void UpdateMovement(Player *player);
 void DrawPlayer(Player *player);
@@ -65,8 +69,10 @@ void InitializePlayer(Player *player)
     
     player->velocity = (Vector2){0, 0};
 
-    player->width = 64;
-    player->height = 64;
+    player->width = 96;
+    player->height = 96;
+
+    player->healthFull = LoadTexture("assets/player_life.png");
 
     player->hook.position = player->position;
     player->hook.direction = (Vector2){0.0f, 0.0f};
@@ -94,11 +100,15 @@ void InitializePlayer(Player *player)
     player->facingRight = true;
     player->grounded = false;
     player->doubleJumpAvailable = true;
+    player->jumpanimationstop = false;
+    player->fallanimationstop = false;
 
     player->state = IDLER;
     player->hits = MAX_HITS;
     player->framecount = 0;
 }
+
+#include "animation.h"
 
 
 bool CheckGrappleRectangle(Vector2 startPosition, Vector2 endPosition, Rectangle object, Vector2 *hitPosition)
@@ -130,6 +140,24 @@ bool CheckGrappleRectangle(Vector2 startPosition, Vector2 endPosition, Rectangle
     return true;
 }
 
+void DrawPlayerHealth(Player *player)
+{
+    int startX = 30;
+    int startY = 30;
+
+    int healthWidth = 40;
+    int healthHeight = 40;
+    int gap = 5;
+
+    for(int i = 0; i < player->hits; i++)
+    {
+        Rectangle source = {0, 0, (float)player->healthFull.width, (float)player->healthFull.height};
+
+        Rectangle destination = {(startX + i * (healthWidth + gap)), startY, healthWidth, healthHeight};
+
+        DrawTexturePro(player->healthFull, source, destination, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+}
 void RespawnPlayer(Player *player)
 {
     player->position = player->spawnPosition;
@@ -144,6 +172,8 @@ void RespawnPlayer(Player *player)
     player->grounded = false;
     player->doubleJumpAvailable = true;
     player->inWater = false;
+    player->jumpanimationstop = false;
+    player->fallanimationstop = false;
 
     player->defending = false;
     player->attackTimer = 0;
@@ -356,8 +386,28 @@ void UpdateGrappling(Player *player, Map *map)
     }
 }
 
-void InputHandling(Player *player, Map *map)
+void InputHandling(Player *player, Map *map, Boss *boss)
 {
+    if (IsKeyPressed(KEY_F1))
+    {
+        player->position = (Vector2){10000.0f, 1400.0f};
+        player->spawnPosition = player->position;
+        player->velocity = (Vector2){0.0f, 0.0f};
+
+        player->body.x = player->position.x;
+        player->body.y = player->position.y;
+
+        player->attack.x = player->position.x;
+        player->attack.y = player->position.y;
+
+        player->grounded = false;
+        player->doubleJumpAvailable = true;
+
+        TraceLog(LOG_INFO, "F1 CHEAT ACTIVATED!");
+
+        Menu_State = MENU_BOSS;
+    }
+
     UpdateGrappling(player, map);
 
     if(player->state == DEATH)
@@ -366,6 +416,12 @@ void InputHandling(Player *player, Map *map)
     }
 
     player->velocity.x = 0;
+
+    
+    if(IsKeyPressed(KEY_B))
+    {
+        BossStartGroundSlam(boss);
+    }
 
     if(player->state == ATTACK)
     {
@@ -415,37 +471,63 @@ void InputHandling(Player *player, Map *map)
 
 void DrawPlayer(Player *player)
 {
-    // Player animation goes here
     player->framecount++;
     player->framecount = player->framecount % 60;
 
     switch(player->state)
     {
-        case 0: //idlel
+        case 0: 
             UnloadTexture(player->sprite);
             player->sprite = IdleLeftAnimation(player);
             break;
 
-        case 1: //idler
+        case 1: 
             UnloadTexture(player->sprite);
             player->sprite = IdleRightAnimation(player);
             break;
 
-        case 2: //runl
+        case 2: 
             UnloadTexture(player->sprite);
             player->sprite = RunLeftAnimation(player);
             break;
 
-        case 3: //runr
+        case 3: 
             UnloadTexture(player->sprite);
             player->sprite = RunRightAnimation(player);
             break;
-        
-        case 4: //jump
-            break;
 
-        case 5: //fall
+        case 5: 
+            if(player->framecount/5+1 > 6)
+            {
+                player->jumpanimationstop = true;
+            }
+            if(!player->jumpanimationstop)
+            {
+                UnloadTexture(player->sprite);
+                player->sprite = JumpAnimation(player);
+            }
             break;
+        case 6: 
+            if(player->framecount/5+1 > 6)
+            {
+                player->fallanimationstop = true;
+            }
+            if(!player->fallanimationstop)
+            {
+                UnloadTexture(player->sprite);
+                player->sprite = FallAnimation(player);
+            }
+            break;
+        case 11:
+        if(player->framecount/5+1 > 6)
+        {
+            player->state = player->facingRight ? IDLER : IDLEL;
+            player->framecount = 0;
+            break;
+        }
+        UnloadTexture(player->sprite);
+        player->sprite = FallAnimationWhileGround(player); //animation is not working, but will not change it as it still looks good
+        break;
 
     }
 
@@ -493,10 +575,8 @@ void UpdateMovement(Player *player)
         return;
     }
 
-    //gravity
     player->velocity.y += GRAVITY;
 
-    //MOVE PLAYER
     player->position.x += player->velocity.x;
     player->body.x = player->position.x;
 
@@ -531,5 +611,11 @@ void UpdatePlayerState(Player *player)
     if(previous_state != player->state)
     {
         player->framecount = 0;
+        if(player->fallanimationstop)
+        {
+            player->state = LANDING;
+        }
+        player->fallanimationstop = false;
+        player->jumpanimationstop = false;
     }
 }
