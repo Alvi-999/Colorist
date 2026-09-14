@@ -138,6 +138,32 @@ bool CheckGrappleRectangle(Vector2 startPosition, Vector2 endPosition, Rectangle
     return true;
 }
 
+void DrawPlayerHealth(Player *player)
+{
+    int maxHealth = MAX_HITS;
+
+    int startX = 30;
+    int startY = 30;
+
+    int heartWidth = 35;
+    int heartHeight = 25;
+    int gap = 9;
+
+    for(int i = 0; i < maxHealth; i++)
+    {
+        Rectangle heartBox = {(startX + i * (heartWidth + gap)), startY, heartWidth, heartHeight};
+    
+        if(i < player->hits)
+        {
+            DrawRectangleRec(heartBox, RED);
+        }
+        else
+        {
+            DrawRectangleLinesEx(heartBox, 2, DARKGRAY);
+        }
+    }
+}
+
 void RespawnPlayer(Player *player)
 {
     player->position = player->spawnPosition;
@@ -397,6 +423,7 @@ void InputHandling(Player *player, Map *map, Boss *boss)
 
     player->velocity.x = 0;
 
+    
     if(IsKeyPressed(KEY_B))
     {
         BossStartGroundSlam(boss);

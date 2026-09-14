@@ -29,6 +29,10 @@ typedef struct Boss
     int attackTimer;
     int attackCooldown;
 
+    bool groundSlamming;
+    bool slamDamageDone;
+    float slamTimer;
+
     Texture2D sprite;
 
 } Boss;
@@ -60,6 +64,10 @@ void InitialBoss(Boss *boss)
 
     boss->attacking = false;
     boss->attackHitPlayer = false;
+
+    boss->groundSlamming = true;
+    boss->slamDamageDone = false;
+    boss->slamTimer = 0.0f;
 
     int attackTimer = 0;
     int attackCooldown = 120;
@@ -94,9 +102,9 @@ void BossStartGroundSlam(Boss *boss)
         return;
     }
 
-    boss->attacking = true;
-    boss->attackHitPlayer = false;
-    boss->attackTimer = 0;
+    boss->groundSlamming= true;
+    boss->slamDamageDone = false;
+    boss->slamTimer = 0.0f;
 
     TraceLog(LOG_INFO, "BOSS GROUND SLAM STARTED!");
 }
@@ -205,81 +213,57 @@ void UpdateBoss(Boss *boss, Player *player)
         return;
     }
 
-    // Keep boss body updated
-    boss->body.x = boss->position.x;
-    boss->body.y = boss->position.y;
+    boss->body = (Rectangle){
+        boss->position.x,
+        boss->position.y,
+        boss->width,
+        boss->height
+    };
 
-
-    // ==================================================
-    // WAIT BEFORE ATTACKING
-    // ==================================================
-
-    if(!boss->attacking)
+   
+    if(boss->groundSlamming)
     {
-        boss->attackCooldown--;
+        boss->slamTimer += GetFrameTime();
 
-        if(boss->attackCooldown <= 0)
+        if(boss->slamTimer >= 1.0f &&
+           !boss->slamDamageDone)
         {
-            BossStartGroundSlam(boss);
+            Rectangle slamArea = {
+                boss->position.x - 500.0f,
+                boss->position.y + boss->height - 30.0f,
+                boss->width + 1000.0f,
+                80.0f
+            };
+
+            if(CheckCollisionRecs(slamArea, player->body))
+            {
+                TakeDamage(player, 1);
+
+                TraceLog(LOG_INFO, "GROUND SLAM HIT PLAYER!");
+            }
+
+            boss->slamDamageDone = true;
+        }
+
+        
+        if(boss->slamTimer >= 1.1f)
+        {
+            boss->groundSlamming = false;
+            boss->slamDamageDone = false;
+            boss->slamTimer = 0.0f;
+
+            boss->attackCooldown = 120;
+
+            TraceLog(LOG_INFO, "GROUND SLAM FINISHED!");
         }
 
         return;
     }
 
+   boss->attackCooldown--;
 
-    // ==================================================
-    // ATTACK TIMER
-    // ==================================================
-
-    boss->attackTimer++;
-
-
-    // ==================================================
-    // PHASE 1: TRACK PLAYER
-    // Frames 1-35
-    // ==================================================
-
-    if(boss->attackTimer < 36)
+    if(boss->attackCooldown <= 0)
     {
-        if(player->position.x > boss->position.x)
-        {
-            boss->position.x += 3.0f;
-        }
-        else if(player->position.x < boss->position.x)
-        {
-            boss->position.x -= 3.0f;
-        }
-
-        boss->body.x = boss->position.x;
-    }
-
-    if(boss->attackTimer >= 36 &&
-       boss->attackTimer < 48)
-    {
-        boss->attack = (Rectangle){boss->position.x - 250.0f, boss->position.y + boss->height - 60.0f, boss->width + 500.0f, 60.0f};
-
-        if(!boss->attackHitPlayer && CheckCollisionRecs(boss->attack, player->body))
-        {
-            TakeDamage(player, 1);
-
-            boss->attackHitPlayer = true;
-
-            TraceLog(LOG_INFO, "GROUND SLAM HIT PLAYER!");
-        }
-    }
-
-    if(boss->attackTimer >= 72)
-    {
-        boss->attacking = false;
-
-        boss->attackHitPlayer = false;
-
-        boss->attackTimer = 0;
-
-        boss->attackCooldown = 120;
-
-        boss->attack = (Rectangle){0, 0, 0, 0};
-
-        TraceLog(LOG_INFO, "GROUND SLAM FINISHED!");
+        BossStartGroundSlam(boss);
     }
 }

@@ -71,17 +71,9 @@ int main()
 
             EndMode2D();
 
-            DrawText(
-                TextFormat("PLAYER X: %.0f  Y: %.0f",
-                        player.position.x,
-                        player.position.y),
-                20,
-                20,
-                24,
-                YELLOW
-            );
-
+            DrawPlayerHealth(&player);
             DrawBossHealth(&boss);
+
             EndDrawing();
         }
         else if (Menu_State == MENU_QUIT)
