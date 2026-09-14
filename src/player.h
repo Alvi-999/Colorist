@@ -388,6 +388,11 @@ void UpdateGrappling(Player *player, Map *map)
 
 void InputHandling(Player *player, Map *map, Boss *boss)
 {
+    if(IsKeyPressed(KEY_F11))
+    {
+        ToggleFullscreen();
+    }
+
     if (IsKeyPressed(KEY_F1))
     {
         player->position = (Vector2){10000.0f, 1400.0f};
